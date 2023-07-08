@@ -16,9 +16,13 @@
 [submodule "3rdParty/imgui"]
 	path = 3rdParty/imgui
 	url = https://github.com/ocornut/imgui
-[submodule "3rdParty/SDL"]
-	path = 3rdParty/SDL
-	url = https://github.com/libsdl-org/SDL/tree/SDL2
 [submodule "3rdParty/yaml-cpp"]
 	path = 3rdParty/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
+[submodule "3rdParty/bgfx-imgui"]
+	path = 3rdParty/bgfx-imgui
+	url = https://github.com/pr0g/sdl-bgfx-imgui-starter
+[submodule "3rdParty/SDL"]
+	path = 3rdParty/SDL
+	url = https://github.com/libsdl-org/SDL
+	branch = SDL2
