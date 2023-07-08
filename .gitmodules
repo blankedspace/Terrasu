@@ -1,0 +1,24 @@
+[submodule "3rdParty/bx"]
+	path = 3rdParty/bx
+	url = https://github.com/bkaradzic/bx
+[submodule "3rdParty/bgfx"]
+	path = 3rdParty/bgfx
+	url = https://github.com/bkaradzic/bgfx
+[submodule "3rdParty/bimg"]
+	path = 3rdParty/bimg
+	url = https://github.com/bkaradzic/bimg
+[submodule "3rdParty/entt"]
+	path = 3rdParty/entt
+	url = https://github.com/skypjack/entt
+[submodule "3rdParty/glm"]
+	path = 3rdParty/glm
+	url = https://github.com/g-truc/glm
+[submodule "3rdParty/imgui"]
+	path = 3rdParty/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "3rdParty/SDL"]
+	path = 3rdParty/SDL
+	url = https://github.com/libsdl-org/SDL/tree/SDL2
+[submodule "3rdParty/yaml-cpp"]
+	path = 3rdParty/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp
