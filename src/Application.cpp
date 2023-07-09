@@ -6,7 +6,7 @@
 
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
-#include "../3rdParty/bgfx-imgui/imgui_impl_bgfx.h"
+#include "imgui_impl_bgfx.h"
 namespace Terrasu
 {
 

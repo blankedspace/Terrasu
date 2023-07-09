@@ -13,7 +13,7 @@ project "Terrasu"
    "src/**.cpp",
    "3rdParty/imgui/*.cpp",
    "3rdParty/imgui/backends/imgui_impl_sdl2.cpp",
-   "3rdParty/bgfx-imgui/*.cpp"
+   "3rdParty/bgfx-imgui/bgfx-imgui/*.cpp"
    }
    includedirs 
    {
@@ -25,12 +25,12 @@ project "Terrasu"
     "3rdParty/entt/src",
     "3rdParty/yaml-cpp/include",
     "3rdParty/imgui",
-    "3rdParty/bgfx-imgui/",
+    "3rdParty/bgfx-imgui/bgfx-imgui",
     "src/include"
    }
     libdirs
     {
-	    "3rdParty/bgfx/.build/win64_vs2019/bin"
+	    "3rdParty/bgfx/.build/win64_vs2017/bin"
     }
     buildoptions 
 	{

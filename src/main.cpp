@@ -1,6 +1,6 @@
 #include<iostream>
 #include "Application.h"
-#include "../3rdParty/bgfx-imgui/imgui_impl_bgfx.h"
+#include "imgui_impl_bgfx.h"
 int main(int argc, char* argv[])
 {
 	{
@@ -8,8 +8,9 @@ int main(int argc, char* argv[])
 		app.Init();
 		app.MainLoop();
 	}
-
+#if BX_CONFIG_DEBUG
 	ImGui_Implbgfx_Shutdown();
+#endif
 	bgfx::shutdown();
 	return 0;
 }

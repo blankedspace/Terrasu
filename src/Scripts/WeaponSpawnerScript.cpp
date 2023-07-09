@@ -41,7 +41,7 @@ namespace Terrasu {
 
 				Uniform uniform;
 				uniform.m_name = "TileData";
-				uniform.data = { 49 ,22 ,34 + rand() % 2 , 15 + rand() % 4 };
+				uniform.data = { 49 ,22 ,34 + rand() % 2 , 16 + rand() % 4 };
 
 				uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
 				mat.uniforms.push_back(uniform);

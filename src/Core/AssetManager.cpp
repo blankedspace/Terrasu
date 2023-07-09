@@ -3,14 +3,17 @@
 #include "bimg/bimg.h"
 #include "bimg/decode.h"
 #include <fstream>
+#include <iostream>
 namespace Terrasu {
 
 
 	AssetManager::AssetManager(){
 		m_reader = std::make_unique<bx::FileReader>();
+		std::cout << "Created";
 
 	}
 	AssetManager::~AssetManager(){
+		std::cout << "Destroyed";
 		for (const auto& tx : m_textures) {
 			bgfx::destroy(tx.second->handle);
 			bgfx::destroy(tx.second->texColor);
