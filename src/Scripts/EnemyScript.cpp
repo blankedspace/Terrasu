@@ -3,7 +3,7 @@ namespace Terrasu {
 	void EnemyScript::GetHit(int dmg)
 	{
 		Health--;
-		GetComponent<SpriteComponent>().material.uniforms[1].data = { 1,0.2,0.2,1 };
+		GetComponent<SpriteComponent>()->material.uniforms[1].data = { 1,0.2,0.2,1 };
 		if (Health <= 0)
 		{
 			Destroy();
@@ -16,8 +16,8 @@ namespace Terrasu {
 		weapon.Angle = 360/20.0f;
 		weapon.ShootEvery = 5.0f;
 		weapon.TimeToLive = 5.0f;
-		GetComponent<TransformComponent>().Scale *= 6;
-		GetComponent<SimplePhysicsComponent>().Rect = {0,0,6,6};
+		GetComponent<TransformComponent>()->Scale *= 6;
+		GetComponent<SimplePhysicsComponent>()->Rect = {0,0,6,6};
 	}
 	void EnemyScript::OnCreate()
 	{
@@ -33,25 +33,25 @@ namespace Terrasu {
 		weapon.TimeToLive = 0.9f + (rand() % 100) / 25;
 		weapon.MaxAmmo = weapon.Ammo = 1000;
 
-		player = &FindObjectOfType<PlayerScript>();
+		player = FindObjectOfType<PlayerScript>();
 	}
 	static float lerp(float x, float y, float t) {
 		return x + (y - x) * t;
 	}
 	void EnemyScript::OnUpdate(float dt)
 	{
-		GetComponent<SpriteComponent>().material.uniforms[1].data.y = lerp(GetComponent<SpriteComponent>().material.uniforms[1].data.y, 1, 3 * dt);
-		GetComponent<SpriteComponent>().material.uniforms[1].data.z = lerp(GetComponent<SpriteComponent>().material.uniforms[1].data.z, 1, 3 * dt);
-		auto& transform = GetComponent<TransformComponent>();
-		player = &FindObjectOfType<PlayerScript>();
+		GetComponent<SpriteComponent>()->material.uniforms[1].data.y = lerp(GetComponent<SpriteComponent>()->material.uniforms[1].data.y, 1, 3 * dt);
+		GetComponent<SpriteComponent>()->material.uniforms[1].data.z = lerp(GetComponent<SpriteComponent>()->material.uniforms[1].data.z, 1, 3 * dt);
+		auto transform = GetComponent<TransformComponent>();
+		player = FindObjectOfType<PlayerScript>();
 		if (player == nullptr) {
 			return;
 		}
 		Speed = 2.5f + 0.25f * player->Difficulty;
-		glm::vec3 direction = player->GetComponent<TransformComponent>().Translation - transform.Translation;
-		GetComponent<SimplePhysicsComponent>().Speed = glm::normalize(direction) * Speed;
+		glm::vec3 direction = player->GetComponent<TransformComponent>()->Translation - transform->Translation;
+		GetComponent<SimplePhysicsComponent>()->Speed = glm::normalize(direction) * Speed;
 		if(glm::length2(direction) < 100.0f)
-			GetComponent<SimplePhysicsComponent>().Speed += glm::normalize(glm::vec3{direction.y,direction.x,0});
+			GetComponent<SimplePhysicsComponent>()->Speed += glm::normalize(glm::vec3{direction.y,direction.x,0});
 		
 		m_shootEvery += dt;
 
@@ -72,30 +72,28 @@ namespace Terrasu {
 				uniform.m_name = "TileData";
 				uniform.data = weapon.tiledata;
 
-				uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
 				mat.uniforms.push_back(uniform);
 
 
 				uniform.m_name = "u_Color";
 				uniform.data = { 1 ,1 ,1 ,1 };
 
-				uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
 				mat.uniforms.push_back(uniform);
 
-				auto& bullet = BindScript<BulletScript>(ent);
-				bullet.Direction = glm::normalize(player->GetComponent<TransformComponent>().Translation - transform.Translation);
-				bullet.targetIsPlayer = true;
-				bullet.FiredFrom = weapon;
+				auto bullet = BindScript<BulletScript>(ent);
+				bullet->Direction = glm::normalize(player->GetComponent<TransformComponent>()->Translation - transform->Translation);
+				bullet->targetIsPlayer = true;
+				bullet->FiredFrom = weapon;
 
-				ent.GetComponent<TransformComponent>().Translation = transform.Translation;
+				ent.GetComponent<TransformComponent>().Translation = transform->Translation;
 
 
 
 
 				//ent.AddComponent<NativeScriptComponent>().Bind<BulletController>();
-				bullet.FiredFrom = weapon;
+				bullet->FiredFrom = weapon;
 
-				glm::vec3 v3(bullet.Direction.x, bullet.Direction.y, 0.0f);
+				glm::vec3 v3(bullet->Direction.x, bullet->Direction.y, 0.0f);
 
 				// create the rotation matrix
 				glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(weapon.Angle * i), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -104,7 +102,7 @@ namespace Terrasu {
 				glm::vec3 rotated_v3 = rotation * glm::vec4(v3, 1.0f);
 
 				// convert the rotated vec3 back to a vec2
-				bullet.Direction = { rotated_v3.x, rotated_v3.y,0 };
+				bullet->Direction = { rotated_v3.x, rotated_v3.y,0 };
 
 			}
 

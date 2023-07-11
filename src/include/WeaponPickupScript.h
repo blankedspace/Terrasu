@@ -1,5 +1,5 @@
 #pragma once
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 namespace Terrasu {
 
 	struct Weapon {
@@ -21,7 +21,6 @@ namespace Terrasu {
 	class WeaponPickupScript : public NativeScript {
 	protected:
 		void OnCreate() override;
-		virtual void OnDestroy() {}
 		void OnUpdate(float dt) override;
 		void OnColide(Entity other) override;
 

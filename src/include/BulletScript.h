@@ -1,11 +1,9 @@
 #pragma once
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 #include "WeaponPickupScript.h"
 namespace Terrasu {
 	class BulletScript : public NativeScript {
 	protected:
-		virtual void OnCreate() {}
-		virtual void OnDestroy() {}
 		void OnUpdate(float dt) override;
 		void OnColide(Entity other) override;
 	private:

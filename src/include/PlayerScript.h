@@ -1,5 +1,5 @@
 #pragma once
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 #include "WeaponPickupScript.h"
 namespace Terrasu {
 
@@ -11,7 +11,6 @@ namespace Terrasu {
 		int Difficulty = 0;
 	protected:
 		void OnCreate() override;
-		virtual void OnDestroy() {}
 		void OnUpdate(float dt) override;
 		void OnColide(Entity other) override;
 		

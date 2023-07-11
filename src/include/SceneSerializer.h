@@ -1,5 +1,4 @@
 #pragma once
-#define YAML_CPP_STATIC_DEFINE 1
 #include "yaml-cpp/yaml.h"
 #include "AssetManager.h"
 #include "Scene.h"

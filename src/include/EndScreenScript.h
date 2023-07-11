@@ -1,5 +1,5 @@
 #pragma once
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 namespace Terrasu {
 
 
@@ -7,9 +7,7 @@ namespace Terrasu {
 
 	protected:
 		void OnCreate() override;
-		virtual void OnDestroy() {}
 		void OnUpdate(float dt) override;
-		virtual void OnColide(Entity other) {}
 	private:
 		float waitTime = 0;
 		TextUIComponent* GameOverText = nullptr;

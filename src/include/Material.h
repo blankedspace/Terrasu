@@ -16,7 +16,6 @@ namespace Terrasu {
 
 		const bgfx::UniformType::Enum m_type = bgfx::UniformType::Vec4;
 		std::string m_name;
-		bgfx::UniformHandle m_handle;
 		glm::vec4 data;
 
 		Uniform& operator=(const Uniform& right) {

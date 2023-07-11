@@ -1,5 +1,4 @@
 #include "SceneSerializer.h"
-#include "NativeScriptComponent.h"
 #include "Scripts.h"
 #include <fstream>
 #include "Entity.h"
@@ -287,7 +286,7 @@ namespace Terrasu {
 				Uniform uniform;
 				uniform.m_name = uni["Name"].as<std::string>();
 				uniform.data = uni["UniformData"].as<glm::vec4>();
-				uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
+
 				src.material.uniforms.push_back(uniform);
 			}
 
@@ -306,7 +305,7 @@ namespace Terrasu {
 				Uniform uniform;
 				uniform.m_name = uni["Name"].as<std::string>();
 				uniform.data = uni["UniformData"].as<glm::vec4>();
-				uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
+
 				src.material.uniforms.push_back(uniform);
 			}
 			src.UpdateText(src.text);
@@ -324,6 +323,7 @@ namespace Terrasu {
 		if (nativeScriptComponent) {
 			auto& src = deserializedEntity.AddComponent<NativeScriptComponent>();
 			src.InstantiateScript = ScriptFactory[nativeScriptComponent["type"].as<std::string>()];
+			
 		}
 
 		auto coliderComponent = entity["ColiderComponent"];

@@ -1,10 +1,10 @@
 #include "Scene.h"
 #include "bx/math.h"
 #include "Entity.h"
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 #include <iostream>
 #include "SDL.h"
-
+#include "bgfx/platform.h"
 #include "Scripts.h"
 
 #include "imgui_impl_bgfx.h"
@@ -31,8 +31,7 @@ namespace Terrasu {
 
 	Entity Scene::AddEntity(Entity& ent)
 	{
-		if (&ent == nullptr)
-			AddEntity("Error");
+	
 
 		SceneSerializer srz{ m_assetManager.get(),this };
 		YAML::Emitter out;
@@ -47,8 +46,6 @@ namespace Terrasu {
 	Scene::~Scene() {
 		if (Runtime) {
 			Runtime = false;
-			collisionframe = -9999;
-			m_collision.join();
 		}
 
 		for (const auto entity : m_registry.view<TagComponent>()) {
@@ -88,12 +85,12 @@ namespace Terrasu {
 		m_componentPanel->m_assetManager = m_assetManager.get();
 
 
-
+		SDL_Log("90");
 		m_colisionFunction = [this]()
 		{
-			//around 60 fps
-			float updaterate = 16.6f;
-			while (collisionframe >= 0 ) {
+			
+				//around 60 fps
+				float updaterate = 16.6f;
 
 				if ((int)(timeAlive * 1000) / updaterate >= collisionframe) {
 					while (!unlockFromMain.load(std::memory_order_seq_cst)) {};
@@ -123,8 +120,8 @@ namespace Terrasu {
 									auto& script = entity.GetComponent<NativeScriptComponent>();
 									if (script.Instance != nullptr && entity.IsAlive())
 									{
-										
-										m_Colisions.insert({ ent,ent2});
+
+										m_Colisions.insert({ ent,ent2 });
 									}
 								}
 
@@ -162,8 +159,8 @@ namespace Terrasu {
 					}
 					unlockFromColision.store(true, std::memory_order_seq_cst);
 				}
-			}
 
+			
 		};
 
 		
@@ -172,6 +169,7 @@ namespace Terrasu {
 		for (auto [ent, script] : viewNS.each()) {
 
 			if (!script.Instance) {
+			
 				script.Instance = script.InstantiateScript();
 				script.Instance->entity.m_entity = ent;
 				script.Instance->entity.m_scene = this;
@@ -181,18 +179,16 @@ namespace Terrasu {
 		for (auto [ent, script] : viewNS.each()) {
 			script.Instance->OnCreate();
 		}
-#if !BX_CONFIG_DEBUG
-		Runtime = true;
-		m_collision = std::thread(m_colisionFunction);
-#endif
+		SDL_Log("184");
+		Runtime = false;
 	}
 
 	void Scene::OnUpdate() {
 
 		Uint64 start = SDL_GetPerformanceCounter();
-
+		m_colisionFunction();
 		m_toDesroy.clear();
-#if BX_CONFIG_DEBUG
+#if BX_CONFIG_DEBUG && BX_PLATFORM_WINDOWS
 		ImGui_Implbgfx_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
@@ -202,16 +198,9 @@ namespace Terrasu {
 			if (!Runtime && ImGui::MenuItem("Play")) {
 				Runtime = true;
 				timeAlive = 0;
-				collisionframe = 0;
-				m_collision = std::thread(m_colisionFunction);
-
-
 			}
 			else if (Runtime && ImGui::MenuItem("Stop")) {
 				Runtime = false;
-				collisionframe = -9999;
-				m_collision.join();
-
 			}
 			if (ImGui::BeginMenu("File")) {
 				if (ImGui::MenuItem("Save")) {
@@ -262,10 +251,10 @@ namespace Terrasu {
 		}
 
 
+		//Collision 
 		if (m_Colisions.size() > 0 && unlockFromColision.load(std::memory_order_seq_cst)) {
 			unlockFromMain.store(false, std::memory_order_seq_cst);
 
-			//Collision 
 			for (auto& ents : m_Colisions) {
 				Entity entity{ ents.first,this };
 				if (entity.HasComponent<NativeScriptComponent>())
@@ -300,7 +289,7 @@ namespace Terrasu {
 				}
 			}
 
-		bgfx::frame();
+
 
 		if (m_toDesroy.size() > 0) {
 
@@ -334,6 +323,8 @@ namespace Terrasu {
 		for (auto [entity, transform, text] : viewTT.each()) {
 			m_renderer->DrawText(transform, text);
 		}
+
+		bgfx::frame();
 
 		Uint64 end = SDL_GetPerformanceCounter();
 		dt = (end - start) / (float)SDL_GetPerformanceFrequency();

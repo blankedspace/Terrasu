@@ -1,5 +1,5 @@
 #pragma once
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 #include "WeaponPickupScript.h" 
 namespace Terrasu {
 	class EnemyScript : public NativeScript {
@@ -8,9 +8,8 @@ namespace Terrasu {
 		void BecomeGiant();
 	protected:
 		void OnCreate() override;
-		virtual void OnDestroy() {}
 		void OnUpdate(float dt) override;
-		virtual void OnColide(Entity other) {}
+
 		PlayerScript* player = nullptr;
 		Weapon weapon;
 		float m_shootEvery = 0;

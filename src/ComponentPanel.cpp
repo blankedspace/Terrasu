@@ -1,5 +1,5 @@
 #include "ComponentPanel.h"
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 #include "Scripts.h"
 namespace Terrasu{
 	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f) {
@@ -10,7 +10,7 @@ namespace Terrasu{
 
 		//ImGui::Columns(2);
 		//		ImGui::SetColumnWidth(0, columnWidth);
-		ImGui::Text(label.c_str());
+		ImGui::TextUnformatted(label.c_str());
 		//ImGui::NextColumn();
 
 		//ImGui::Mu(3, ImGui::CalcItemWidth());
@@ -79,7 +79,7 @@ namespace Terrasu{
 
 		//ImGui::Columns(2);
 		//		ImGui::SetColumnWidth(0, columnWidth);
-		ImGui::Text(label.c_str());
+		ImGui::TextUnformatted(label.c_str());
 		//ImGui::NextColumn();
 
 		//ImGui::Mu(3, ImGui::CalcItemWidth());
@@ -172,7 +172,7 @@ namespace Terrasu{
 			//float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 			float lineHeight = 20;
 			ImGui::Separator();
-			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
+			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
 			ImGui::PopStyleVar();
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight })){
@@ -219,7 +219,7 @@ namespace Terrasu{
 		if (entity.HasComponent<TagComponent>()) {
 			auto& tag = entity.GetComponent<TagComponent>().tag;
 
-			char* buffer = _strdup(tag.c_str());
+			char* buffer = strdup(tag.c_str());
 			if (ImGui::InputText("##Tag", buffer, 99)) {
 				tag = std::string(buffer);
 			}
@@ -240,7 +240,7 @@ namespace Terrasu{
 				uniform.m_name = "TileData";
 				uniform.data = { 48.0,22.0,25.5,1.0 };
 
-				uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
+
 				mat.uniforms.push_back(uniform);
 			}
 			if (DisplayAddComponentEntry<NativeScriptComponent>("Empty Script")) {
@@ -287,14 +287,14 @@ namespace Terrasu{
 			bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetId(), treeNodeFlags, "Material");
 			if (opened) {
 				ImGui::Text("Shader:");
-				char* buffer = _strdup(mat->shader.shaderName.c_str());
+				char* buffer = strdup(mat->shader.shaderName.c_str());
 				if (ImGui::InputText("##shader", buffer, 99)) {
 					mat->shader.shaderName = std::string(buffer);
 				}
 				ImGui::Text("Textures:");
 				for (auto& text : mat->textures) {
 
-					buffer = _strdup(text.textureName.c_str());
+					buffer = strdup(text.textureName.c_str());
 					if (ImGui::InputText("##texture", buffer, 99)) {
 						text.textureName = std::string(buffer);
 					}
@@ -305,7 +305,7 @@ namespace Terrasu{
 					Uniform uni;
 					uni.m_name = "Empty" ;
 					uni.data = { 0,0,0,0 };
-					uni.m_handle = bgfx::createUniform(uni.m_name.c_str(), uni.m_type);
+
 					mat->uniforms.push_back(uni);
 				}
 				ImGui::SameLine();
@@ -313,8 +313,8 @@ namespace Terrasu{
 				int counter = 0;
 				for (auto& uni : mat->uniforms) {
 
-					buffer = _strdup(uni.m_name.c_str());
-					if (ImGui::InputText("##uniform" + char(counter), buffer, 99)) {
+					buffer = strdup(uni.m_name.c_str());
+					if (ImGui::InputText(std::string("##uniform").append(std::to_string(counter)).c_str(), buffer, 99)) {
 						uni.m_name = std::string(buffer);
 
 					}
@@ -335,7 +335,7 @@ namespace Terrasu{
 
 					for (auto& uni : mat->uniforms) {
 
-						uni.m_handle = bgfx::createUniform(uni.m_name.c_str(), uni.m_type);
+			
 						material.uniforms.push_back(uni);
 					}
 					entity.GetComponent<SpriteComponent>().material = material;
@@ -385,7 +385,7 @@ namespace Terrasu{
 		}
 		if (DrawComponent<TextUIComponent>("TextUI", entity)) {
 			TextUIComponent& component = entity.GetComponent<TextUIComponent>();
-			auto buffer = _strdup(component.text.c_str());
+			auto buffer = strdup(component.text.c_str());
 			if (ImGui::InputText("text", buffer, 99)) {
 				component.text = std::string(buffer);
 				component.UpdateText(component.text);
@@ -397,7 +397,7 @@ namespace Terrasu{
 			bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetId(), treeNodeFlags, "Material");
 			if (opened) {
 				ImGui::Text("Shader:");
-				char* buffer = _strdup(mat->shader.shaderName.c_str());
+				char* buffer = strdup(mat->shader.shaderName.c_str());
 				if (ImGui::InputText("##shader", buffer, 99)) {
 					mat->shader.shaderName = std::string(buffer);
 				}
@@ -410,7 +410,7 @@ namespace Terrasu{
 				ImGui::Text("Textures:");
 				for (auto& text : mat->textures) {
 
-					buffer = _strdup(text.textureName.c_str());
+					buffer = strdup(text.textureName.c_str());
 					if (ImGui::InputText("##texture", buffer, 99)) {
 						text.textureName = std::string(buffer);
 					}
@@ -421,7 +421,7 @@ namespace Terrasu{
 					Uniform uni;
 					uni.m_name = "Empty";
 					uni.data = { 0,0,0,0 };
-					uni.m_handle = bgfx::createUniform(uni.m_name.c_str(), uni.m_type);
+		
 					mat->uniforms.push_back(uni);
 				}
 				ImGui::SameLine();
@@ -429,8 +429,8 @@ namespace Terrasu{
 				int counter = 0;
 				for (auto& uni : mat->uniforms) {
 
-					buffer = _strdup(uni.m_name.c_str());
-					if (ImGui::InputText("##uniform" + char(counter), buffer, 99)) {
+					buffer = strdup(uni.m_name.c_str());
+					if (ImGui::InputText(std::string("##uniform").append(std::to_string(counter)).c_str(), buffer, 99)) {
 						uni.m_name = std::string(buffer);
 
 					}
@@ -449,7 +449,7 @@ namespace Terrasu{
 
 					for (auto& uni : mat->uniforms) {
 
-						uni.m_handle = bgfx::createUniform(uni.m_name.c_str(), uni.m_type);
+					
 						material.uniforms.push_back(uni);
 					}
 					entity.GetComponent<TextUIComponent>().material = material;
@@ -465,7 +465,7 @@ namespace Terrasu{
 		auto& tag = entity.GetComponent<TagComponent>().tag;
 		ImGuiTreeNodeFlags flags = (m_SelectionContext!=nullptr && (*m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetId(), flags, tag.c_str());
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)entity.GetId(), flags, "%s", tag.c_str());
 		if (ImGui::IsItemClicked())
 		{
 			delete m_SelectionContext;
@@ -496,7 +496,7 @@ namespace Terrasu{
 		if (opened)
 		{
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
+			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, "%s", tag.c_str());
 			if (opened)
 				ImGui::TreePop();
 			ImGui::TreePop();
@@ -536,7 +536,7 @@ namespace Terrasu{
 				uniform.m_name = "TileData";
 				uniform.data = { 49.0,22.0,25.5,1.0 };
 
-				uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
+
 				mat.uniforms.push_back(uniform);
 			}
 				//AddEntity("Empty Entity")->AddComponent<SpriteRenderComponent>().m_textureColor = Renderer::TryLoadTexture("Assets/Error.png");

@@ -3,6 +3,7 @@
 #include "Components.h"
 #include "SimpleQuad.h"
 #include "Material.h"
+#include "AssetManager.h"
 namespace Terrasu {
 
 	class Renderer {
@@ -12,7 +13,9 @@ namespace Terrasu {
 
 		void DrawQuad(const TransformComponent& transform,const Material& material);
 		void DrawText(const TransformComponent& transform, const TextUIComponent& text);
+		std::shared_ptr<AssetManager> m_assetManager;
 	private:
 		SimpleQuad quad;
+	
 	};
 }

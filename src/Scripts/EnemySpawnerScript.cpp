@@ -14,26 +14,26 @@ namespace Terrasu {
 		uniform.m_name = "TileData";
 		uniform.data = { 49 ,22 ,25 + rand() % 5  ,6 + rand() % 5 };
 
-		uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
+
 		mat.uniforms.push_back(uniform);
 
 
 		uniform.m_name = "u_Color";
 		uniform.data = { 1 ,1 ,1 ,1 };
 
-		uniform.m_handle = bgfx::createUniform(uniform.m_name.c_str(), uniform.m_type);
+
 		mat.uniforms.push_back(uniform);
 
-		ent.GetComponent<TransformComponent>().Translation = GetComponent<TransformComponent>().Translation;
-		auto& enemy = BindScript<EnemyScript>(ent);
+		ent.GetComponent<TransformComponent>().Translation = GetComponent<TransformComponent>()->Translation;
+		auto enemy = BindScript<EnemyScript>(ent);
 		if ((rand() % 100 ) > 95) {
-			enemy.BecomeGiant();
+			enemy->BecomeGiant();
 		}
 
 	}
 	void EnemySpawnerScript::OnUpdate(float dt)
 	{
-		auto player = &FindObjectOfType<PlayerScript>();
+		auto player = FindObjectOfType<PlayerScript>();
 		if (player == nullptr) {
 			return;
 		}

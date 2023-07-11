@@ -19,6 +19,7 @@ namespace Terrasu {
 		bool WriteFile(std::string Filepath,bgfx::Memory data);
 		bool WriteFileStr(std::string Filepath, std::string data);
 		std::string ReadFileStr(std::string Filepath);
+		bgfx::UniformHandle CreateUniformHandle(std::string name);
 
 		void HotReload();
 	private:
@@ -29,6 +30,8 @@ namespace Terrasu {
 
 		std::unordered_map<std::string,std::unique_ptr<Texture>> m_textures;
 		std::unordered_map<std::string, std::unique_ptr<Shader>> m_shaders;
+		std::unordered_map<std::string, bgfx::UniformHandle> m_uniforms;
+
 
 };
 }

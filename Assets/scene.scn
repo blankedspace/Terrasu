@@ -2,63 +2,9 @@ Scene: Untitled
 Entities:
   - Entity: 1234214
     TagComponent:
-      Tag: UiWeapon
-    TransformComponent:
-      Translation: [0.262499988, 0.899999976, 0]
-      Rotation: [0, 0, 0]
-      Scale: [0.0399999991, 0.0399999991, 0.0399999991]
-    SpriteComponent:
-      Order: 0
-      Shader: UIfillQuad
-      Texture: Assets/8bitPack.png
-      Uniforms:
-        - Name: TileData
-          UniformData: [49, 22, 33, 2]
-        - Name: Fill
-          UniformData: [1, 0, 0, 0]
-        - Name: u_Color
-          UniformData: [0, 0, 0, 1]
-  - Entity: 1234214
-    TagComponent:
-      Tag: Wall
-    TransformComponent:
-      Translation: [-26.5, -4, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 3.70000005, 1]
-    ColiderComponent:
-      Rect: [0, 0, 1, 4]
-  - Entity: 1234214
-    TagComponent:
-      Tag: Wall
-    TransformComponent:
-      Translation: [-28.6000004, 10.1999998, 0]
-      Rotation: [0, 0, 0]
-      Scale: [9.89999962, 1, 1]
-    ColiderComponent:
-      Rect: [0, 0, 10, 1]
-  - Entity: 1234214
-    TagComponent:
-      Tag: Wall
-    TransformComponent:
-      Translation: [-23.1000004, -0.100000001, 0]
-      Rotation: [0, 0, 0]
-      Scale: [2.20000005, 1, 1]
-    ColiderComponent:
-      Rect: [0, 0, 2.20000005, 1]
-  - Entity: 1234214
-    TagComponent:
-      Tag: Wall1
-    TransformComponent:
-      Translation: [4.9000001, 50.5, 0]
-      Rotation: [0, 0, 0]
-      Scale: [44, 1, 1]
-    ColiderComponent:
-      Rect: [0, 0, 44, 1]
-  - Entity: 1234214
-    TagComponent:
       Tag: Weapon
     TransformComponent:
-      Translation: [6.69999981, 0.800000012, 0]
+      Translation: [6.69999981, 0.925696135, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteComponent:
@@ -71,46 +17,48 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::WeaponPickupScript
+      type: WeaponPickupScript
     ColiderComponent:
       Rect: [0, 0, 1, 1]
   - Entity: 1234214
     TagComponent:
       Tag: Camera
     TransformComponent:
-      Translation: [-3.82135344, 4.13000011, 0]
+      Translation: [-3.80506587, 0.00680472096, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CameraComponent:
-      eye: [-3.82135344, 0.02892722, -59.5]
+      eye: [-3.80506587, 0.00680472096, -59.5]
     NativeScriptComponent:
-      type: class Terrasu::CameraScript
+      type: CameraScript
   - Entity: 1234214
     TagComponent:
       Tag: Timer
     TransformComponent:
-      Translation: [-0.0199999996, 0.800000012, 0]
+      Translation: [-0.0399999991, 0.800000012, 0]
       Rotation: [0, 0, 0]
-      Scale: [0.0250000004, 0.0500000007, 1]
+      Scale: [0.0399999991, 0.0399999991, 1]
     TextUIComponent:
       Text: 0:0
       Shader: text
-      Texture: Assets/8BitPack.png
+      Texture: Assets/8bitPack.png
       Uniforms:
         - Name: TileData
           UniformData: [49, 22, 0, 0]
         - Name: Fill
-          UniformData: [6.4000001, 0, 0, 0]
+          UniformData: [5.5, 0, 0, 0]
+        - Name: u_Color
+          UniformData: [1, 1, 1, 1]
   - Entity: 1234214
     TagComponent:
       Tag: Hearts
     TransformComponent:
-      Translation: [0.00268999999, 0.899999976, 0]
+      Translation: [0.00159999996, 0.899999976, 0]
       Rotation: [0, 0, 0]
-      Scale: [0.200000003, 0.0399999991, 1]
+      Scale: [0.119999997, 0.0399999991, 1]
     SpriteComponent:
       Order: 0
-      Shader: UIfillQuad
+      Shader: uq
       Texture: Assets/Hearts.png
       Uniforms:
         - Name: TileData
@@ -136,7 +84,7 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::PlayerScript
+      type: PlayerScript
     ColiderComponent:
       Rect: [0, 0, 1, 1]
   - Entity: 1234214
@@ -145,10 +93,10 @@ Entities:
     TransformComponent:
       Translation: [0, 0.899999976, 0]
       Rotation: [0, 0, 0]
-      Scale: [0.200000003, 0.0399999991, 1]
+      Scale: [0.119999997, 0.0399999991, 1]
     SpriteComponent:
       Order: 0
-      Shader: UIfillQuad
+      Shader: uq
       Texture: Assets/HeartsContainer.png
       Uniforms:
         - Name: TileData
@@ -187,7 +135,7 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::EnemySpawnerScript
+      type: EnemySpawnerScript
   - Entity: 1234214
     TagComponent:
       Tag: Spawner
@@ -205,7 +153,7 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::EnemySpawnerScript
+      type: EnemySpawnerScript
   - Entity: 1234214
     TagComponent:
       Tag: Spawner
@@ -223,7 +171,7 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::EnemySpawnerScript
+      type: EnemySpawnerScript
   - Entity: 1234214
     TagComponent:
       Tag: Spawner
@@ -241,7 +189,7 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::EnemySpawnerScript
+      type: EnemySpawnerScript
   - Entity: 1234214
     TagComponent:
       Tag: WeaponGiver
@@ -259,7 +207,7 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::WeaponSpawnerScript
+      type: WeaponSpawnerScript
   - Entity: 1234214
     TagComponent:
       Tag: WeaponGiver
@@ -277,7 +225,7 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::WeaponSpawnerScript
+      type: WeaponSpawnerScript
   - Entity: 1234214
     TagComponent:
       Tag: WeaponGiver
@@ -295,12 +243,12 @@ Entities:
         - Name: u_Color
           UniformData: [1, 1, 1, 1]
     NativeScriptComponent:
-      type: class Terrasu::WeaponSpawnerScript
+      type: WeaponSpawnerScript
   - Entity: 1234214
     TagComponent:
       Tag: Wall
     TransformComponent:
-      Translation: [-19.5, 4.0999999, 0]
+      Translation: [-19.5, 4.08431196, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 5.0999999, 1]
     ColiderComponent:
@@ -318,7 +266,7 @@ Entities:
     TagComponent:
       Tag: Wall
     TransformComponent:
-      Translation: [-33.7999992, -7.69999981, 0]
+      Translation: [-33.6870155, -7.57590008, 0]
       Rotation: [0, 0, 0]
       Scale: [5.80000019, 1, 1]
     ColiderComponent:
@@ -345,8 +293,44 @@ Entities:
     TagComponent:
       Tag: Wall2
     TransformComponent:
-      Translation: [-40.4000015, -25, 0]
+      Translation: [-40.5024185, -25.1395607, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 89.5, 1]
     ColiderComponent:
       Rect: [0, 0, 1, 99]
+  - Entity: 1234214
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      Translation: [-26.5, -4, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 3.70000005, 1]
+    ColiderComponent:
+      Rect: [0, 0, 1, 4]
+  - Entity: 1234214
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      Translation: [-23.1000004, -0.100000001, 0]
+      Rotation: [0, 0, 0]
+      Scale: [2.20000005, 1, 1]
+    ColiderComponent:
+      Rect: [0, 0, 2.20000005, 1]
+  - Entity: 1234214
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      Translation: [-28.6000004, 10.1999998, 0]
+      Rotation: [0, 0, 0]
+      Scale: [9.89999962, 1, 1]
+    ColiderComponent:
+      Rect: [0, 0, 10, 1]
+  - Entity: 1234214
+    TagComponent:
+      Tag: Wall1
+    TransformComponent:
+      Translation: [4.9000001, 50.5, 0]
+      Rotation: [0, 0, 0]
+      Scale: [44, 1, 1]
+    ColiderComponent:
+      Rect: [0, 0, 44, 1]

@@ -3,10 +3,19 @@
 #include <iostream>
 #include "Input.h"
 
-
+#if BX_PLATFORM_WINDOWS
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui_impl_bgfx.h"
+#endif
+#if BX_PLATFORM_ANDROID
+namespace bx {
+	Location Location::current(const char* _filePath, uint32_t _line)
+	{
+		return Location(_filePath, _line);
+	}
+}
+#endif
 namespace Terrasu
 {
 
@@ -20,9 +29,8 @@ namespace Terrasu
 		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
 		}
+		SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
 		m_window = SDL_CreateWindow("Terrasu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_width, m_height, SDL_WINDOW_RESIZABLE);
-
-
 		SDL_SysWMinfo wmi;
 		SDL_VERSION(&wmi.version);
 		if (!SDL_GetWindowWMInfo(m_window, &wmi))
@@ -31,14 +39,24 @@ namespace Terrasu
 		}
 		//initialize BGFX
 		bgfx::Init init;
+#if BX_PLATFORM_WINDOWS
+		
 		init.type = bgfx::RendererType::Direct3D11;
 		init.platformData.nwh = wmi.info.win.window;
+#elif BX_PLATFORM_EMSCRIPTEN 
+		init.type = bgfx::RendererType::OpenGLES;
+		init.platformData.nwh = (void*)"#canvas";
+#elif BX_PLATFORM_ANDROID
+
+		init.type = bgfx::RendererType::OpenGL;
+		init.platformData.nwh =  wmi.info.android.window;
+
+#endif
 		init.resolution.width = m_width;
 		init.resolution.height = m_height;
-		init.resolution.reset = BGFX_RESET_NONE;
+		init.resolution.reset = BGFX_RESET_VSYNC;
 		bgfx::init(init);
-
-		
+		SDL_Log("58");
 		bgfx::setViewClear(0
 			, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 			, 0x303030ff
@@ -46,13 +64,13 @@ namespace Terrasu
 			, 0
 		);
 		bgfx::setViewRect(0, 0, 0, m_width, m_height);
-
+	
 		//initialize Game
 		m_renderer = std::make_shared<Renderer>();
 		m_assetManager = std::make_shared<AssetManager>();
 		m_activeScene = std::make_unique<Scene>();
-
-
+		SDL_Log("71");
+		m_renderer->m_assetManager = m_assetManager;
 
 		m_activeScene->m_screenheight = m_height;
 		m_activeScene->m_screenwidth = m_width;
@@ -62,33 +80,36 @@ namespace Terrasu
 
 		m_sceneSerializer = std::make_unique<SceneSerializer>( m_assetManager.get(), m_activeScene.get());
 		//m_sceneSerializer->Serialize("Assets/scene.scn");
+
+		SDL_Log("79");
 		m_sceneSerializer->Deserialize("Assets/scene.scn");
-
+		SDL_Log("83");
 		m_activeScene->OnStart();
-
+		SDL_Log("85");
+#if BX_PLATFORM_WINDOWS
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 		//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		ImGui_Implbgfx_Init(255);
 
 		ImGui_ImplSDL2_InitForD3D(m_window);
+#endif
 
 	}
 
-	void Application::MainLoop()
+	bool Application::MainLoop()
 	{
 		bool exit = false;
 		SDL_Event event;
-		//Main loop
-		while (!exit) {
+
 
 			//Input
 
 			SDL_GetMouseState(&Input::Mouse.x, &Input::Mouse.y);
 			while (SDL_PollEvent(&event) > 0) {
-
+#if BX_PLATFORM_WINDOWS
 				ImGui_ImplSDL2_ProcessEvent(&event);
-
+#endif
 				switch (event.type)
 				{
 				case SDL_MOUSEBUTTONDOWN:
@@ -125,7 +146,7 @@ namespace Terrasu
 						m_activeScene->m_screenheight = m_height;
 						m_activeScene->m_screenwidth = m_width;
 
-						bgfx::reset(m_width, m_height, BGFX_RESET_NONE);
+						bgfx::reset(m_width, m_height, BGFX_RESET_VSYNC);
 						//bgfx::setViewRect(0, 0, 0, m_width, m_height);
 						break;
 					}
@@ -144,7 +165,7 @@ namespace Terrasu
 		
 
 
-		}
+		return exit;
 
 	}
 

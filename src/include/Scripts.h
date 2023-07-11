@@ -8,7 +8,7 @@
 #include "EndScreenScript.h"
 #include "WeaponSpawnerScript.h"
 #include "HealthPackScript.h"
-#define ELEMENT(SCRIPT) {typeid(SCRIPT).name(), []() { return static_cast<NativeScript*>(new SCRIPT()); }}
+#define ELEMENT(SCRIPT) {#SCRIPT, []() { return static_cast<NativeScript*>(new SCRIPT()); }}
 namespace Terrasu {
 
 	static std::map<std::string, NativeScript* (*)()> ScriptFactory = {

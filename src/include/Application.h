@@ -21,7 +21,7 @@ namespace Terrasu
 	public:
 		Application(int width,int height);
 		void Init();
-		void MainLoop();
+		bool MainLoop();
 		void ChangeScene(Scene* scene);
 	private:
 		SDL_Window* m_window = nullptr;

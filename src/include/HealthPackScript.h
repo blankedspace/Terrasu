@@ -1,5 +1,5 @@
 #pragma once
-#include "NativeScriptComponent.h"
+#include "Entity.h"
 namespace Terrasu {
 
 
@@ -7,7 +7,6 @@ namespace Terrasu {
 
 	protected:
 		void OnCreate() override;
-		virtual void OnDestroy() {}
 		void OnUpdate(float dt) override;
 		void OnColide(Entity other) override;
 	private:

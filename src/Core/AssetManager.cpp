@@ -4,11 +4,110 @@
 #include "bimg/decode.h"
 #include <fstream>
 #include <iostream>
+#include <SDL.h>
+#if BX_PLATFORM_ANDROID
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+
+#endif
 namespace Terrasu {
 
+#if BX_PLATFORM_ANDROID
+	class FileReaderAndroid : public bx::FileReaderI
+	{
+	public:
+		FileReaderAndroid(AAssetManager* _assetManager, AAsset* _file)
+			: m_assetManager(_assetManager)
+			, m_file(_file)
+			, m_open(false)
+		{
+		}
 
+		virtual ~FileReaderAndroid()
+		{
+			close();
+		}
+
+		virtual bool open(const bx::FilePath& _filePath, bx::Error* _err) override
+		{
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			if (NULL != m_file)
+			{
+				BX_ERROR_SET(_err, bx::kErrorReaderWriterAlreadyOpen, "FileReader: File is already open.");
+				return false;
+			}
+
+
+			m_file = AAssetManager_open(m_assetManager, _filePath.getCPtr(), AASSET_MODE_RANDOM);
+
+			if (NULL == m_file)
+			{
+				BX_ERROR_SET(_err, bx::kErrorReaderWriterOpen, "FileReader: Failed to open file.");
+				return false;
+			}
+
+			m_open = true;
+			return true;
+		}
+
+		virtual void close() override
+		{
+			if (m_open
+				&& NULL != m_file)
+			{
+				AAsset_close(m_file);
+				m_file = NULL;
+			}
+		}
+
+		virtual int64_t seek(int64_t _offset, bx::Whence::Enum _whence) override
+		{
+			BX_ASSERT(NULL != m_file, "Reader/Writer file is not open.");
+			return AAsset_seek64(m_file, _offset, _whence);
+
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, bx::Error* _err) override
+		{
+			BX_ASSERT(NULL != m_file, "Reader/Writer file is not open.");
+			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			int32_t size = (int32_t)AAsset_read(m_file, _data, _size);
+			if (size != _size)
+			{
+				if (0 == AAsset_getRemainingLength(m_file))
+				{
+					BX_ERROR_SET(_err, bx::kErrorReaderWriterEof, "FileReader: EOF.");
+				}
+
+				return size >= 0 ? size : 0;
+			}
+
+			return size;
+		}
+
+	private:
+		AAssetManager* m_assetManager;
+		AAsset* m_file;
+		bool m_open;
+	};
+#endif
 	AssetManager::AssetManager(){
+#if BX_PLATFORM_ANDROID
+
+		SDL_AndroidGetActivity();
+		JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+		jobject activity = (jobject)SDL_AndroidGetActivity();
+		jclass clazz(env->GetObjectClass(activity));
+		jmethodID methodID = env->GetMethodID(clazz, "getAssets", "()Landroid/content/res/AssetManager;");
+		jobject assetManager = env->CallObjectMethod(activity, methodID);
+		AAssetManager* manager = AAssetManager_fromJava(env, assetManager);
+
+		m_reader = std::make_unique<FileReaderAndroid>(manager,nullptr);
+#else
 		m_reader = std::make_unique<bx::FileReader>();
+#endif
 		std::cout << "Created";
 
 	}
@@ -35,7 +134,7 @@ namespace Terrasu {
 	}
 	bgfx::ShaderHandle AssetManager::loadShaderHandle(const char* _name){
 
-		char filePath[512];
+		std::string filePath;
 		const char* shaderPath = "???";
 
 		switch (bgfx::getRendererType())
@@ -48,8 +147,8 @@ namespace Terrasu {
 		case bgfx::RendererType::Gnm:        shaderPath = "3rdParty/bgfx/examples/runtime/shaders/pssl/";  break;
 		case bgfx::RendererType::Metal:      shaderPath = "3rdParty/bgfx/examples/runtime/shaders/metal/"; break;
 		case bgfx::RendererType::Nvn:        shaderPath = "3rdParty/bgfx/examples/runtime/shaders/nvn/";   break;
-		case bgfx::RendererType::OpenGL:     shaderPath = "Assets/shaders/opengl/";  break;
-		case bgfx::RendererType::OpenGLES:   shaderPath = "Assets/shaders/opengles/";  break;
+		case bgfx::RendererType::OpenGL:     shaderPath = "Assets/shaders/glsl/";  break;
+		case bgfx::RendererType::OpenGLES:   shaderPath = "Assets/shaders/glsl/";  break;
 		case bgfx::RendererType::Vulkan:     shaderPath = "3rdParty/bgfx/examples/runtime/shaders/spirv/"; break;
 		case bgfx::RendererType::WebGPU:     shaderPath = "3rdParty/bgfx/examples/runtime/shaders/spirv/"; break;
 
@@ -58,11 +157,9 @@ namespace Terrasu {
 			break;
 		}
 
-		bx::strCopy(filePath, BX_COUNTOF(filePath), shaderPath);
-		bx::strCat(filePath, BX_COUNTOF(filePath), _name);
-		bx::strCat(filePath, BX_COUNTOF(filePath), ".bin");
-		
-		auto memory = loadMem(filePath);
+		filePath = shaderPath + std::string(_name) + ".bin";
+
+		auto memory = loadMem(filePath.c_str());
 		if(NULL == memory)
 			return BGFX_INVALID_HANDLE;
 		bgfx::ShaderHandle handle = bgfx::createShader(memory);
@@ -81,6 +178,7 @@ namespace Terrasu {
 
 		if (vsh.idx == bgfx::kInvalidHandle)
 		{
+			SDL_Log("%s",(_fsName + " Not Found").c_str());
 			return LoadShader("texturedQuad");
 		}
 
@@ -233,6 +331,15 @@ namespace Terrasu {
 		std::string s((char*)mem->data, mem->size - 1);
 		delete mem;
 		return s;
+	}
+	bgfx::UniformHandle AssetManager::CreateUniformHandle(std::string name)
+	{
+		if (m_uniforms.find(name) != m_uniforms.end()) {
+			return m_uniforms[name];
+		}
+
+		m_uniforms[name] = bgfx::createUniform(name.c_str(),bgfx::UniformType::Vec4);
+		return m_uniforms[name];
 	}
 	void AssetManager::HotReload()
 	{

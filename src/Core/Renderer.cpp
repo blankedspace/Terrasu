@@ -27,7 +27,7 @@ namespace Terrasu
 
 		for (auto uniform : material.uniforms)
 		{
-			bgfx::setUniform(uniform.m_handle, glm::value_ptr(uniform.data));
+			bgfx::setUniform(m_assetManager->CreateUniformHandle(uniform.m_name), glm::value_ptr(uniform.data));
 		}
 		//bgfx::setTexture(0, s_texColor, *TryLoadTexture(spr.textureName));
 		//float t = 2.2;
@@ -68,7 +68,7 @@ namespace Terrasu
 
 		for (auto uniform : material.uniforms)
 		{
-			bgfx::setUniform(uniform.m_handle, glm::value_ptr(uniform.data));
+			bgfx::setUniform(m_assetManager->CreateUniformHandle(uniform.m_name), glm::value_ptr(uniform.data));
 		}
 		//bgfx::setTexture(0, s_texColor, *TryLoadTexture(spr.textureName));
 		//float t = 2.2;
