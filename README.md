@@ -88,6 +88,7 @@ Okay we change compilers. We cant use Visual studio for this job(not completely 
 Installing emscripten should be pretty easy now - just follow commands. But we can use compiler em++ only in the terminal, where we activated emsdk_env.
   First lets build dependencies, we cant use .lib files which were compiled with MSVC or g++.
 - bgfx
+```
     cd 3rdParty\bgfx
   and run
 	..\bx\tools\bin\windows\genie --gcc=wasm gmake
@@ -95,6 +96,7 @@ Installing emscripten should be pretty easy now - just follow commands. But we c
   cd .build\projects\gmake-wasm
   but remember to have activated emsdk_env
   and execute "emmake make" not simple "make".
+```
 -SDL we dont need to build it, its ported to emscripten and easily included with "-S USE-SDL=2"
 -yaml-cpp i simply included to Terrasu project.
 
