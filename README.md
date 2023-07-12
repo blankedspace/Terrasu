@@ -26,9 +26,11 @@ g++ main.cpp -DBX_CONFIG_DEBUG -o main.exe
 ```
   And i recommend to read about compiler flags (like -i -l -L -O3)
   And at this step you include headers, btw compiler just copy pastes headers to your file then you #include "Header.h"
+  
 3. Compiling the source code
 4. Assembling the compiled file
 5. Linking the object code file to create an executable file
+   
    At this step a lot of errors can occur too, C++ is big and old language. So its a pretty hard problem to use others code.
 Usually you compile them with steps i'll explain later, and link to your project, but what if your code and lib code uses different version of C++ and so on.
 We can link staticly with mylib.lib or dinamically with mylib.dll.
