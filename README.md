@@ -44,6 +44,7 @@ g++ *.o -o app.exe
 ```
 So we need a way to optimize this procces. To our help comes: gnu make, Or full blown IDE like visual studio.
 Read how gmake works here - [https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html].
+
 As you can understand thats not ideal way too. If we want to make cross-platfrom app(and we want), we cant use Visual studio to make webassembly proj and android is wierd too.
 And for make we`ll need to write a lot of commands for all platfroms. Ofcourse some one thought about this problem before.I think programming is about abstraction!
 
