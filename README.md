@@ -59,10 +59,12 @@ Simplest way to build is to use vs project files in 3rdParty\SDL\VisualC\SDL.sln
 But ofcourse you can try use Cmake.
 - bgfx[https://bkaradzic.github.io/bgfx/build.html] "Cross-platform, graphics API agnostic, "Bring Your Own Engine/Framework" style rendering library." In simpler words there are a lot of ways to access your GPU
 OpenGl, DirectX, Vulkan... and what to choose depends on build target(DirectX is Windows exclusive for example). So we can just call bgfx functions to build with different renderer API.
+'''
   Bgfx uses self-made tool GENiE - but actually its a fork of premake4 with some changes.
   cd 3rdParty\bgfx
   and run
-	..\bx\tools\bin\windows\genie --with-examples vs2017 (check out examples a lot of interesting info)
+  ..\bx\tools\bin\windows\genie --with-examples vs2017 (check out examples a lot of interesting info)
+'''
   and again build it with Visual studio
 - yaml-cpp [https://github.com/jbeder/yaml-cpp] "yaml-cpp is a YAML parser and emitter in C++ matching the YAML 1.2 spec." I use it to save Scene files in my game. You can check Assets\Scene.scn to see how YAML looks
 	yaml-cpp uses cmake to generate vs project files
@@ -89,9 +91,9 @@ Installing emscripten should be pretty easy now - just follow commands. But we c
   First lets build dependencies, we cant use .lib files which were compiled with MSVC or g++.
 - bgfx
 ```
-    cd 3rdParty\bgfx
+  cd 3rdParty\bgfx
   and run
-	..\bx\tools\bin\windows\genie --gcc=wasm gmake
+  ..\bx\tools\bin\windows\genie --gcc=wasm gmake
   okay now we have makefiles in .build\projects\gmake-wasm
   cd .build\projects\gmake-wasm
   but remember to have activated emsdk_env
@@ -102,9 +104,11 @@ Installing emscripten should be pretty easy now - just follow commands. But we c
 
 But now to build project i use GENiE too, just cuse it aleady have scripts to make wasm make files. Our project is in scripts/genie.lua
 read it to understand compilers flags, includes and links.
+'''
   3rdParty\bx\tools\bin\windows\genie --gcc=wasm gmake
   cd .build\projects\gmake-wasm
-  emmake make
+  emmake mak
+'''
 You now have .js .data .html .wasm files. to check if they work run emrun TerrasuDebug.html (Only debug version is tested, you can edit script genie.lua for release vesrion)
 btw if src folder is in same directory you can debug c++ code in chrome with F12 [https://developer.chrome.com/blog/wasm-debugging-2020/]
 # Building for Android (Android-studio)
