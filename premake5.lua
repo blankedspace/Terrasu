@@ -43,7 +43,7 @@ project "Terrasu"
     "3rdParty/bx/include/compat/msvc"
    }
    filter "configurations:Debug"
-      defines { "DEBUG", "BX_CONFIG_DEBUG=1" }
+      defines { "DEBUG", "BX_CONFIG_DEBUG=1","YAML_CPP_STATIC_DEFINE" }
       staticruntime "on"
       runtime "Debug"
       symbols "On"
@@ -65,7 +65,7 @@ project "Terrasu"
 
 
    filter "configurations:Release"
-      defines { "NDEBUG","BX_CONFIG_DEBUG=0" }
+      defines { "NDEBUG","BX_CONFIG_DEBUG=0","YAML_CPP_STATIC_DEFINE" }
       staticruntime "on"
       optimize "On"
         libdirs
