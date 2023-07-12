@@ -14,12 +14,16 @@ couple of choices:
 e.t.c
 
 To compile single file into a program you usually execute simple command
+```
 g++ main.cpp -o main.exe
+```
 And i recommend to read about compiler steps:
 1. Pre-processing the source code.
   This step involves handling preprocessor directives and macros, which are instructions to modify the source code before compilation.
 Many errors can occur at this step, sometimes you need to pass some defines to a compiler for example:
+```
 g++ main.cpp -DBX_CONFIG_DEBUG -o main.exe
+```
   And i recommend to read about compiler flags (like -i -l -L -O3)
   And at this step you include headers, btw compiler just copy pastes headers to your file then you #include "Header.h"
 3. Compiling the source code
@@ -31,11 +35,13 @@ We can link staticly with mylib.lib or dinamically with mylib.dll.
 
 
 To build a program from many files we need to execute a lot of compiler commands
+```
 g++ one.cpp -o one.o
 g++ two.cpp -o two.o
 ....
 g++ onehundred.cpp -o onehundred.o
 g++ *.o -o app.exe
+```
 So we need a way to optimize this procces. To our help comes: gnu make, Or full blown IDE like visual studio.
 Read how gmake works here - [https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html].
 As you can understand thats not ideal way too. If we want to make cross-platfrom app(and we want), we cant use Visual studio to make webassembly proj and android is wierd too.
@@ -77,13 +83,15 @@ executable, if we debug with visual studio its directory where .sln file is loca
 
 Oh and we need to compile shaders, this is just bgfx thing, because of support for different graphics API, which use different shader languages
 Again i recommend reading about shaders... and honestly [https://learnopengl.com/] is a better place to read about games from scracth. You can easily follow the tutorial with bgfx instead of opengl.
+```
 Building shaders:
 cd Shaders
 and call:
 make
+```
 You can read makefiles to understand what is going on, but basically it uses bgfx shader compilation tool [https://bkaradzic.github.io/bgfx/tools.html#shader-compiler-shaderc].
 
-Now you are ready to run Terrasu.exe)
+Now you are ready to run Terrasu.exe
 # Building for browser (Emscripten)
 Okay we change compilers. We cant use Visual studio for this job(not completely true). 
 [https://emscripten.org/] "Emscripten is a complete compiler toolchain to WebAssembly, using LLVM, with a special focus on speed, size, and the Web platform."
