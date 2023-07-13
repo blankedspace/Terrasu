@@ -1,4 +1,4 @@
-bgfx + SDL cross-platfrom game engine (android wasm win).
+bgfx + SDL cross-platfrom C++ game   (android wasm win).
 # Terrasu
 to download project run
 ```
