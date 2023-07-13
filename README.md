@@ -1,6 +1,10 @@
 # Terrasu
+to download project run
+```
+git clone --recursive https://github.com/blankedspace/Terrasu
+```
 While making a lot of small games with Unity game engine i wondered how 
-cross-platform games work? I choose c++ for my small "game engine". Because it's everywhere, in all operating systems and all big game engines.
+cross-platform games work? I choose C++ for my small "game engine". Because it's everywhere, in all operating systems and all big game engines.
 But i couldnt find simple tutorial on how to make game for win,linux,browsers and mobile with C++. Maybe because C++ is not easy, or 
 because some big tech companies want to push their technologies.
 
@@ -57,7 +61,7 @@ There are tools to generate project files for other tools which use compilers.
 Now you have basic understanding of C++ building pipeline, i recommend downloading some open source programs and building it.
 Maybe something like Godot(it uses Scons, which i didnt mention) [https://docs.godotengine.org/en/stable/contributing/development/compiling/index.html].
 But if you continue reading this guide, we will build a lot of dependencies.
-# Building for windows (Visual Studio)
+# Building for Windows (Visual Studio)
 To compile Terrasu for windows run:
 3rdParty\Premake\premak5.exe vs2019
 All instructions for premake tool is located in premake5.lua file, you can read it to understand dependencies and defines and other compiler flags.
@@ -118,10 +122,61 @@ read it to understand compilers flags, includes and links.
 ```
   3rdParty\bx\tools\bin\windows\genie --gcc=wasm gmake
   cd .build\projects\gmake-wasm
-  emmake mak
+  emmake make
 ```
 You now have .js .data .html .wasm files. to check if they work run emrun TerrasuDebug.html (Only debug version is tested, you can edit script genie.lua for release vesrion)
 btw if src folder is in same directory you can debug c++ code in chrome with F12 [https://developer.chrome.com/blog/wasm-debugging-2020/]
 # Building for Android (Android-studio)
 I cant make better than this tutorial [https://lazyfoo.net/tutorials/SDL/52_hello_mobile/android_windows/index.php]
 though its outdated all concepts are still there.
+dependencies:
+- bgfx
+  Here how to build only for x86_64 but everything is same with armeabi-v7a arm64-v8a x86
+```
+  cd 3rdParty\bgfx
+  and run
+  ..\bx\tools\bin\windows\genie --gcc=anroid_x86_64 gmake
+  okay now we have makefiles in .build\projects\gmake-anroid_x86_64
+  but at first you need to download android_ndk
+	[https://developer.android.com/ndk/downloads]
+  Then you need to set your $(ANDROID_NDK_ROOT) (read make files to see how android compiler is called) folder to your path
+	[https://stackoverflow.com/questions/9546324/adding-a-directory-to-the-path-environment-variable-in-windows]
+    cd .build\projects\gmake-anroid_x86_64
+  and call make
+```
+- yaml-cpp i included it in Android.mk with my project read further to understand.
+- SDL
+To build our project for android we use SDL_activity. Then we include SDL.h in main.cpp we actually redefine main function and asctually use SDL_main. Because of this we can use 3rdParty/SDL/android-project as glue
+to our C++ programm. 
+
+Open 3rdParty/SDL/android-project in android studio. Firstly open android studio settings: File - Project structure - Choose your mode in suggestions "app" - now in modules select Build tools version, NDK version(Download it with android studio if needed), source and target compability (at least 1.8).
+
+Now id you look in build.gradle script you should see:
+```
+externalNativeBuild {
+    ndkBuild {
+	arguments "APP_PLATFORM=android-30"
+	abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+    }
+```
+You can remove 'armeabi-v7a', 'arm64-v8a', 'x86', if you only build 'x86_64' bgfx lib. But it means apk will install only on x86_64 platform
+
+So we use ndkBuild system other option is Cmake. in 3rdParty\SDL\android-project\app\jni you'll find Android.mk, Application.mk and src/Android.mk. These are makefiles used to build our externalNatvieLibrary (our C++ project and SDL lib).
+
+You can copy *.mk files from main folder android-project and read it to understand what is included. How Android.mk works [https://developer.android.com/ndk/guides/android_mk].
+
+And now we need to copy our files to android-project but it is easier to just create link to folder:
+```
+in 3rdParty\SDL\android-project\app\jni
+mklink /D SDL2 (PASTE_YOUR_PATH_HERE)/3rdParty/SDL
+in 3rdParty\SDL\android-project\app\jni\src
+mklink /D src (PASTE_YOUR_PATH_HERE)/src  (our c++ files)
+mklink /D 3rdParty (PASTE_YOUR_PATH_HERE)/3rdParty  (our c++ includes)
+```
+But we still need to pack our assets with apk. In android studio create Assets folder: right-click on project - new - Folder - Assets folder.
+```
+now in 3rdParty\SDL\android-project\app\src\main\assets
+mklink /D Assets (PASTE_YOUR_PATH_HERE)/Assets
+```
+You can build your project and test in emulaltor.
+
