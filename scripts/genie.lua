@@ -89,7 +89,7 @@ project "Terrasu"
 			libdirs
 		{
 		"../3rdParty/SDL/VisualC/x64/Debug",
-		"../3rdParty/bgfx/.build/win64_vs2017/bin"
+		"../3rdParty/bgfx/.build/win64_vs2019/bin"
 		}
 				links
 		{

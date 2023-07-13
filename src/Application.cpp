@@ -56,7 +56,6 @@ namespace Terrasu
 		init.resolution.height = m_height;
 		init.resolution.reset = BGFX_RESET_VSYNC;
 		bgfx::init(init);
-		SDL_Log("58");
 		bgfx::setViewClear(0
 			, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 			, 0x303030ff
@@ -69,7 +68,6 @@ namespace Terrasu
 		m_renderer = std::make_shared<Renderer>();
 		m_assetManager = std::make_shared<AssetManager>();
 		m_activeScene = std::make_unique<Scene>();
-		SDL_Log("71");
 		m_renderer->m_assetManager = m_assetManager;
 
 		m_activeScene->m_screenheight = m_height;
@@ -81,11 +79,9 @@ namespace Terrasu
 		m_sceneSerializer = std::make_unique<SceneSerializer>( m_assetManager.get(), m_activeScene.get());
 		//m_sceneSerializer->Serialize("Assets/scene.scn");
 
-		SDL_Log("79");
 		m_sceneSerializer->Deserialize("Assets/scene.scn");
-		SDL_Log("83");
 		m_activeScene->OnStart();
-		SDL_Log("85");
+
 #if BX_PLATFORM_WINDOWS
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
