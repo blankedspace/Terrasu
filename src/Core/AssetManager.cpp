@@ -108,11 +108,9 @@ namespace Terrasu {
 #else
 		m_reader = std::make_unique<bx::FileReader>();
 #endif
-		std::cout << "Created";
 
 	}
 	AssetManager::~AssetManager(){
-		std::cout << "Destroyed";
 		for (const auto& tx : m_textures) {
 			bgfx::destroy(tx.second->handle);
 			bgfx::destroy(tx.second->texColor);

@@ -30,7 +30,7 @@ project "Terrasu"
    }
     libdirs
     {
-	    "3rdParty/bgfx/.build/win64_vs2017/bin"
+	    "3rdParty/bgfx/.build/win64_vs2019/bin"
     }
     buildoptions 
 	{

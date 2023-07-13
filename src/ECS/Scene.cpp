@@ -84,8 +84,6 @@ namespace Terrasu {
 		m_componentPanel->m_scene = this;
 		m_componentPanel->m_assetManager = m_assetManager.get();
 
-
-		SDL_Log("90");
 		m_colisionFunction = [this]()
 		{
 			
@@ -93,8 +91,6 @@ namespace Terrasu {
 				float updaterate = 16.6f;
 
 				if ((int)(timeAlive * 1000) / updaterate >= collisionframe) {
-					while (!unlockFromMain.load(std::memory_order_seq_cst)) {};
-					unlockFromColision.store(false, std::memory_order_seq_cst);
 					collisionframe++;
 					auto viewCOL = m_registry.group<TransformComponent, SimplePhysicsComponent>();
 					for (auto [ent, transform, col] : viewCOL.each()) {
@@ -157,7 +153,6 @@ namespace Terrasu {
 
 						}
 					}
-					unlockFromColision.store(true, std::memory_order_seq_cst);
 				}
 
 			
@@ -179,8 +174,7 @@ namespace Terrasu {
 		for (auto [ent, script] : viewNS.each()) {
 			script.Instance->OnCreate();
 		}
-		SDL_Log("184");
-		Runtime = false;
+		Runtime = true;
 	}
 
 	void Scene::OnUpdate() {
@@ -253,7 +247,6 @@ namespace Terrasu {
 
 		//Collision 
 		if (m_Colisions.size() > 0 && unlockFromColision.load(std::memory_order_seq_cst)) {
-			unlockFromMain.store(false, std::memory_order_seq_cst);
 
 			for (auto& ents : m_Colisions) {
 				Entity entity{ ents.first,this };
@@ -269,7 +262,6 @@ namespace Terrasu {
 			}
 	
 			m_Colisions.clear();
-			unlockFromMain.store(true, std::memory_order_seq_cst);
 		}
 		//Scripts
 		auto viewNS = m_registry.view<NativeScriptComponent>();

@@ -213,7 +213,9 @@ namespace Terrasu {
 			out << YAML::BeginMap; // TagComponent
 
 			auto& type = entity.GetComponent<NativeScriptComponent>().GetTypeInfo();
-			out << YAML::Key << "type" << YAML::Value << type.name();
+			std::string tname = type.name(); 
+			tname.erase(tname.find("class Terrasu::"), sizeof("class Terrasu::") - 1);
+			out << YAML::Key << "type" << YAML::Value << tname;
 
 			out << YAML::EndMap; // TagComponent
 		}
