@@ -1,3 +1,9 @@
+ <img
+  src="https://github.com/blankedspace/Terrasu/blob/main/Assets/ScreenShot.png"
+  width="700" 
+  alt="Game screenshot"
+  title="Game screenshot">
+  
 bgfx + SDL cross-platfrom C++ game   (android wasm win).
 # Terrasu
 to download project run
@@ -64,7 +70,9 @@ Maybe something like Godot(it uses Scons, which i didnt mention) [https://docs.g
 But if you continue reading this guide, we will build a lot of dependencies.
 # Building for Windows (Visual Studio)
 To compile Terrasu for windows run:
-3rdParty\Premake\premak5.exe vs2019
+```
+3rdParty\Premake\premake5.exe vs2019
+```
 All instructions for premake tool is located in premake5.lua file, you can read it to understand dependencies and defines and other compiler flags.
 Now we have Terrasu.sln and can just open it in visual studio, but at first lets build our dependencies.
 - SDL2[https://wiki.libsdl.org/SDL2/Installation] "Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware."
@@ -81,7 +89,14 @@ OpenGl, DirectX, Vulkan... and what to choose depends on build target(DirectX is
   and again build it with Visual studio
 ```
 - yaml-cpp [https://github.com/jbeder/yaml-cpp] "yaml-cpp is a YAML parser and emitter in C++ matching the YAML 1.2 spec." I use it to save Scene files in my game. You can check Assets\Scene.scn to see how YAML looks
-	yaml-cpp uses cmake to generate vs project files
+	yaml-cpp uses cmake to generate vs project files. But in "yaml-cpp static" project change /MD to /MT in release and /MDd to /MTd in debug [https://stackoverflow.com/questions/757418/should-i-compile-with-md-or-mt]
+```
+  cd 3rdParty\yaml-cpp
+  mkdir build
+  cd build
+  cmake ...
+  and again build it with Visual studio
+```
 
 After building all dependencies check that everything is in right path(Debug and Release) in premake5.lua.
 And now we are ready to build Terrasu executable!
@@ -133,15 +148,16 @@ though its outdated all concepts are still there.
 dependencies:
 - bgfx
   Here how to build only for x86_64 but everything is same with armeabi-v7a arm64-v8a x86
+
+    but at first you need to download android_ndk
+	[https://developer.android.com/ndk/downloads]
+  Then you need to set your $(ANDROID_NDK_ROOT) (read make files to see how android compiler is called) folder to your path
+	[https://stackoverflow.com/questions/9546324/adding-a-directory-to-the-path-environment-variable-in-windows]
 ```
   cd 3rdParty\bgfx
   and run
   ..\bx\tools\bin\windows\genie --gcc=anroid_x86_64 gmake
   okay now we have makefiles in .build\projects\gmake-anroid_x86_64
-  but at first you need to download android_ndk
-	[https://developer.android.com/ndk/downloads]
-  Then you need to set your $(ANDROID_NDK_ROOT) (read make files to see how android compiler is called) folder to your path
-	[https://stackoverflow.com/questions/9546324/adding-a-directory-to-the-path-environment-variable-in-windows]
     cd .build\projects\gmake-anroid_x86_64
   and call make
 ```
