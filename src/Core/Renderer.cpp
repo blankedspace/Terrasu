@@ -1,11 +1,60 @@
+#include "bgfx/bgfx.h"
 #include "Renderer.h"
+namespace Terrasu {
+
+	static PosUvTileVertex quadVertices[] =
+	{
+
+
+		{-1.0f,  1.0f, 1.0f,  0.0f, 1.0f, 1.0f },  //0
+		{ 1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 1.0f },  //1
+		{-1.0f, -1.0f, 1.0f,  1.0f, 1.0f, 1.0f },  //2
+		{ 1.0f, -1.0f, 0.0f,  1.0f, 1.0f, 1.0f },  //3
+	};
+
+	static const uint16_t quadTriList[] =
+	{
+
+		2, 3, 1,
+		1, 0, 2,
+
+	};
+	class Renderer;
+	class SimpleQuad {
+	public:
+		SimpleQuad() {
+			PosUvTileVertex::init();
+
+
+			m_vbh = bgfx::createVertexBuffer(
+				bgfx::makeRef(quadVertices, sizeof(quadVertices)),
+				PosUvTileVertex::ms_layout);
+
+
+
+			m_ibh = bgfx::createIndexBuffer(
+				bgfx::makeRef(quadTriList, sizeof(quadTriList))
+			);
+
+		}
+		~SimpleQuad() {
+			bgfx::destroy(m_ibh);
+			bgfx::destroy(m_vbh);
+		};
+	private:
+		bgfx::VertexBufferHandle m_vbh;
+		bgfx::IndexBufferHandle m_ibh;
+
+		friend Renderer;
+	};
+}
 namespace Terrasu
 {
 	bgfx::VertexLayout PosUvTileVertex::ms_layout;
 
 	Renderer::Renderer()
 	{
-	
+		quad = new SimpleQuad();
 	}
 	Renderer::~Renderer()
 	{
@@ -17,8 +66,8 @@ namespace Terrasu
 		bgfx::setTransform(glm::value_ptr(transform.GetTransform()));
 
 		// Set vertex and index buffer.
-		bgfx::setVertexBuffer(0, quad.m_vbh);
-		bgfx::setIndexBuffer(quad.m_ibh);
+		bgfx::setVertexBuffer(0, quad->m_vbh);
+		bgfx::setIndexBuffer(quad->m_ibh);
 
 		for (auto texture : material.textures)
 		{

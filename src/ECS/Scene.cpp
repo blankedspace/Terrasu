@@ -1,3 +1,5 @@
+#include "bgfx/bgfx.h"
+#include "bx/bx.h"
 #include "Scene.h"
 #include "bx/math.h"
 #include "Entity.h"

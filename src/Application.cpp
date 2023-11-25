@@ -1,8 +1,10 @@
+#include "SceneSerializer.h"
 #include "Application.h"
+#include "Components.h"
 #include <SDL_syswm.h>
 #include <iostream>
 #include "Input.h"
-
+#include "bgfx/bgfx.h"
 #if BX_PLATFORM_WINDOWS
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"

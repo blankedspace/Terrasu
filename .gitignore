@@ -1,3 +1,11 @@
+*.sln
+*.vcxproj
+*.filters
+.vs/
+*.user
+bin/
+obj/
+
 # Gradle files
 .gradle/
 build/

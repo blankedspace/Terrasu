@@ -1,4 +1,6 @@
 #include "AssetManager.h"
+#include "bgfx/bgfx.h"
+
 #include "bx/bx.h"
 #include "bimg/bimg.h"
 #include "bimg/decode.h"

@@ -3,12 +3,13 @@ workspace "Terrasu"
    configurations { "Debug", "Release" }
    platforms {"x64"}
 project "Terrasu"
-   kind "ConsoleApp"
+   kind "StaticLib"
    language "C++"
    cppdialect "C++17"
    targetdir "bin/%{cfg.buildcfg}"
 
    files {
+   "include/**.h", 
    "src/**.h", 
    "src/**.cpp",
    "3rdParty/imgui/*.cpp",
@@ -17,6 +18,7 @@ project "Terrasu"
    }
    includedirs 
    {
+    "include", 
     "3rdParty/bgfx/include",
     "3rdParty/bx/include",
     "3rdParty/bimg/include",
@@ -26,11 +28,10 @@ project "Terrasu"
     "3rdParty/yaml-cpp/include",
     "3rdParty/imgui",
     "3rdParty/bgfx-imgui/bgfx-imgui",
-    "src/include"
    }
     libdirs
     {
-	    "3rdParty/bgfx/.build/win64_vs2019/bin"
+	    "3rdParty/bgfx/.build/win64_vs2017/bin"
     }
     buildoptions 
 	{
