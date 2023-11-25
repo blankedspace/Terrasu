@@ -10,64 +10,6 @@ to download project run
 ```
 git clone --recursive https://github.com/blankedspace/Terrasu
 ```
-While making a lot of small games with Unity game engine i wondered how 
-cross-platform games work? I choose C++ for my small "game engine". Because it's everywhere, in all operating systems and all big game engines.
-But i couldnt find simple tutorial on how to make game for win,linux,browsers and mobile with C++. Maybe because C++ is not easy, or 
-because some big tech companies want to push their technologies.
-
-This is not a professional git,just a small guide from newbie to newbies.
-
-At first you need to understand how compiler works. There are 
-couple of choices:
-1. Microsoft Visual C++ compiler
-2. The GNU compiler collection
-3. Clang/LLVM
-e.t.c
-
-To compile single file into a program you usually execute simple command
-```
-g++ main.cpp -o main.exe
-```
-And i recommend to read about compiler steps:
-1. Pre-processing the source code.
-  This step involves handling preprocessor directives and macros, which are instructions to modify the source code before compilation.
-Many errors can occur at this step, sometimes you need to pass some defines to a compiler for example:
-```
-g++ main.cpp -DBX_CONFIG_DEBUG -o main.exe
-```
-  And i recommend to read about compiler flags (like -i -l -L -O3)
-  And at this step you include headers, btw compiler just copy pastes headers to your file then you #include "Header.h"
-  
-2. Compiling the source code
-3. Assembling the compiled file
-4. Linking the object code file to create an executable file
-   
-   At this step a lot of errors can occur too, C++ is big and old language. So its a pretty hard problem to use others code.
-Usually you compile them with steps i'll explain later, and link to your project, but what if your code and lib code uses different version of C++ and so on.
-We can link staticly with mylib.lib or dinamically with mylib.dll.
-
-
-To build a program from many files we need to execute a lot of compiler commands
-```
-g++ one.cpp -o one.o
-g++ two.cpp -o two.o
-....
-g++ onehundred.cpp -o onehundred.o
-g++ *.o -o app.exe
-```
-So we need a way to optimize this procces. To our help comes: gnu make, Or full blown IDE like visual studio.
-Read how gmake works here - [https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html].
-
-As you can understand thats not ideal way too. If we want to make cross-platfrom app(and we want), we cant use Visual studio to make webassembly proj and android is wierd too.
-And for make we`ll need to write a lot of commands for all platfroms. Ofcourse some one thought about this problem before.I think programming is about abstraction!
-
-There are tools to generate project files for other tools which use compilers.
-[https://cmake.org/] Cmake is a tool to generate project files, like makefiles or visual studio project files.
-[https://premake.github.io/] But in our project we will use Premake.
-
-Now you have basic understanding of C++ building pipeline, i recommend downloading some open source programs and building it.
-Maybe something like Godot(it uses Scons, which i didnt mention) [https://docs.godotengine.org/en/stable/contributing/development/compiling/index.html].
-But if you continue reading this guide, we will build a lot of dependencies.
 # Building for Windows (Visual Studio)
 To compile Terrasu for windows run:
 ```
