@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
-
+#include <map>
 #include "SDL.h"
 
 namespace Terrasu
@@ -11,6 +11,7 @@ namespace Terrasu
 	class AssetManager;
 	class Scene;
 	class SceneSerializer;
+	class NativeScript;
 	class Application
 	{
 	public:
@@ -18,6 +19,7 @@ namespace Terrasu
 		void Init();
 		bool MainLoop();
 		void ChangeScene(Scene* scene);
+		static std::map<std::string, NativeScript* (*)()> ScriptFactory;
 	private:
 		SDL_Window* m_window = nullptr;
 		int m_width, m_height;

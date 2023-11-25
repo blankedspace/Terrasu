@@ -7,6 +7,8 @@
 #include <fstream>
 #include <iostream>
 #include <SDL.h>
+#include "Renderer/Shader.h"
+#include "Renderer/Material.h"
 #if BX_PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>

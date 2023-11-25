@@ -1,14 +1,24 @@
 #pragma once
 
-#include "Shader.h"
-#include "Material.h"
+
 #include <memory>
 #include <string>
 #include "bx/file.h"
 #include "bimg/bimg.h"
 #include <unordered_map>
 //Loading Shader, Sprites, pure binary, pure text.
+namespace bgfx {
+	struct Memory;
+	struct UniformHandle;
+	struct ShaderHandle;
+	struct TextureHandle;
+	struct TextureInfo;
+}
 namespace Terrasu {
+	class Shader;
+	class Texture;
+	class Material;
+	
 	class AssetManager {
 	public:
 		AssetManager();

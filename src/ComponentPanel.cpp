@@ -1,6 +1,12 @@
+#include "Renderer/Shader.h"
+#include "Renderer/Material.h"
+#include "AssetManager.h"
 #include "ComponentPanel.h"
-#include "Entity.h"
-#include "Scripts.h"
+#include "ECS/Entity.h"
+#include "Scripts/Scripts.h"
+#include "ECS/Components.h"
+#include "ECS/Scene.h"
+
 namespace Terrasu{
 	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f) {
 		ImGuiIO& io = ImGui::GetIO();
@@ -403,7 +409,7 @@ namespace Terrasu{
 				}
 				if (ImGui::Button("Add"))
 				{
-					auto texture =m_assetManager->LoadTexture("Assets/Error.png");
+					auto texture = m_assetManager->LoadTexture("Assets/Error.png");
 					mat->textures.push_back(*texture);
 				}
 				ImGui::SameLine();

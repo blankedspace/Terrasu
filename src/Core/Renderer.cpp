@@ -1,5 +1,5 @@
 #include "bgfx/bgfx.h"
-#include "Renderer.h"
+#include "Renderer/Renderer.h"
 namespace Terrasu {
 
 	static PosUvTileVertex quadVertices[] =

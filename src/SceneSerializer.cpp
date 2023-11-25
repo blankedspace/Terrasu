@@ -1,10 +1,10 @@
-#include "SceneSerializer.h"
-#include "Scripts.h"
+#include "ECS/SceneSerializer.h"
+#include "Scripts/Scripts.h"
 #include <fstream>
-#include "Entity.h"
-
+#include "ECS/Entity.h"
+#include "ECS/Components.h"
 #include <iostream>
-
+#include "Application.h"
 namespace YAML {
 
 	template<>
@@ -324,7 +324,9 @@ namespace Terrasu {
 		auto nativeScriptComponent = entity["NativeScriptComponent"];
 		if (nativeScriptComponent) {
 			auto& src = deserializedEntity.AddComponent<NativeScriptComponent>();
-			src.InstantiateScript = ScriptFactory[nativeScriptComponent["type"].as<std::string>()];
+			auto tf = nativeScriptComponent["type"].as<std::string>();
+			auto whyy = Terrasu::Application::ScriptFactory[tf];
+			src.InstantiateScript = whyy;
 			
 		}
 

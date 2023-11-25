@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Components.h"
+#include "ECS/Components.h"
 #include "SimpleQuad.h"
 #include "Material.h"
 #include "AssetManager.h"

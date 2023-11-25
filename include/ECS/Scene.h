@@ -1,15 +1,15 @@
 #pragma once
 #include "entt/entt.hpp"
 
-#include "Renderer.h"
-#include "AssetManager.h"
+
 #include <thread>
 namespace Terrasu {
 	class Application;
 	class Entity;
 	class SceneSerializer;
 	class ComponentPanel;
-
+	class AssetManager;
+	class Renderer;
 	struct pair_hash {
 		inline std::size_t operator()(const std::pair<entt::entity, entt::entity>& v) const {
 			return (uint32_t)v.first * 31 + (uint32_t)v.second;

@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-#include "Material.h"
+#include "Renderer/Material.h"
 #include "SimpleQuad.h"
 #include <unordered_map>
 namespace Terrasu {

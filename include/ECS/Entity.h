@@ -1,13 +1,14 @@
 #pragma once
 #include "entt/entt.hpp"
-#include "Components.h"
-#include "Scene.h"
-
+#include "glm/glm.hpp"
+#include "ECS/Scene.h"
 #include <iostream>
 #include <typeinfo>
 namespace Terrasu {
 	class NativeScript;
 	class NativeScriptComponent;
+	class Scene;
+	class AssetManager;
 	class Entity {
 	public:
 		Entity() = default;	
@@ -16,9 +17,7 @@ namespace Terrasu {
 		{
 		
 		}
-		inline void RestartScene() {
-			m_scene->Restart();
-		}
+		void RestartScene();
 		template<typename T, typename... Args>
 		inline T& AddComponent(Args&&... args)
 		{
@@ -39,20 +38,7 @@ namespace Terrasu {
 		template<typename T>
 		T* FindObjectOfType();
 
-		inline Entity FindObject(std::string tag) {
-			for (auto [ent, script] : m_scene->m_registry.view<TagComponent>().each()) {
-
-				auto tg = m_scene->m_registry.get<TagComponent>(ent).tag;
-				if (m_scene->m_registry.get<TagComponent>(ent).tag == tag)
-				{
-					Entity temp{ ent,m_scene };
-					return temp;
-				}
-					
-			}
-
-			return {};
-		}
+		Entity FindObject(std::string tag); 
 		template<typename T>
 		inline bool RemoveComponent()
 		{
@@ -67,19 +53,11 @@ namespace Terrasu {
 		inline uint32_t GetId() {
 			return (uint32_t)m_entity;
 		}
-		inline AssetManager* GetAssetManager() {
-			return m_scene->m_assetManager.get();
-		}
-		inline void Destroy() {
-			m_scene->m_toDesroy.insert(m_entity);
-		}
-		inline bool IsAlive()
-		{
-			return m_scene->IsEntityAlive(m_entity);
-		}
-		inline glm::vec2 GetScreenSize() {
-			return {m_scene->m_screenwidth,m_scene->m_screenheight};
-		}
+		AssetManager* GetAssetManager(); 
+		void Destroy();
+		bool IsAlive();
+	
+		glm::vec2 GetScreenSize();
 	private:
 		Scene* m_scene = nullptr;
 		entt::entity m_entity = entt::null;

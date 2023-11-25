@@ -1,10 +1,14 @@
-#include "SceneSerializer.h"
+#include "Renderer/Shader.h"
+#include "Renderer/Material.h"
+#include "ECS/SceneSerializer.h"
 #include "Application.h"
-#include "Components.h"
+#include "Renderer/Renderer.h"
+#include "ECS/Components.h"
 #include <SDL_syswm.h>
 #include <iostream>
 #include "Input.h"
 #include "bgfx/bgfx.h"
+
 #if BX_PLATFORM_WINDOWS
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"

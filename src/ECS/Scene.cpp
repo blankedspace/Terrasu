@@ -1,21 +1,21 @@
+#include "AssetManager.h"
 #include "bgfx/bgfx.h"
 #include "bx/bx.h"
-#include "Scene.h"
+#include "ECS/Scene.h"
 #include "bx/math.h"
-#include "Entity.h"
-#include "Entity.h"
+#include "ECS/Entity.h"
 #include <iostream>
 #include "SDL.h"
 #include "bgfx/platform.h"
-#include "Scripts.h"
-
+#include "Scripts/Scripts.h"
 #include "imgui_impl_bgfx.h"
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "../ComponentPanel.h"
-#include "SceneSerializer.h"
+#include "ECS/SceneSerializer.h"
 #include "Application.h"
-
+#include "Renderer/Renderer.h"
+#include "AssetManager.h"
 #include "AABB.h"
 #include <mutex>
 

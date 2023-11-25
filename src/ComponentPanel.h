@@ -2,7 +2,8 @@
 #include "imgui.h"
 #include "glm/glm.hpp"
 #include <string>
-#include "Entity.h"
+#include "ECS/Entity.h"
+#include "AssetManager.h"
 namespace Terrasu {
 	class ComponentPanel {
 	public:
