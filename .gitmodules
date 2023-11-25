@@ -28,4 +28,4 @@
 	branch = SDL2
 [submodule "3rdParty/spine-cpp"]
 	path = 3rdParty/spine-cpp
-	url = https://github.com/EsotericSoftware/spine-runtimes.git
+	url = https://github.com/EsotericSoftware/spine-runtimes
