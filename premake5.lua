@@ -14,7 +14,8 @@ project "Terrasu"
    "src/**.cpp",
    "3rdParty/imgui/*.cpp",
    "3rdParty/imgui/backends/imgui_impl_sdl2.cpp",
-   "3rdParty/bgfx-imgui/bgfx-imgui/*.cpp"
+   "3rdParty/bgfx-imgui/bgfx-imgui/*.cpp",
+   "3rdParty/spine-cpp/spine-cpp/spine-cpp/src/spine/*.cpp"
    }
    includedirs 
    {
@@ -28,6 +29,7 @@ project "Terrasu"
     "3rdParty/yaml-cpp/include",
     "3rdParty/imgui",
     "3rdParty/bgfx-imgui/bgfx-imgui",
+	"3rdParty/spine-cpp/spine-cpp/spine-cpp/include"
    }
     libdirs
     {

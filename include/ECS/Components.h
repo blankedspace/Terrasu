@@ -4,7 +4,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 #include "Renderer/Material.h"
-#include "SimpleQuad.h"
+#include "Renderer/Vertex.h"
+#include "Asset/SpineAnimation.h"
 #include <unordered_map>
 namespace Terrasu {
 
@@ -173,5 +174,9 @@ namespace Terrasu {
 		} state = Dynamic;
 	};
 
-
+	struct SpineComponent {
+	public:
+		SpineAnimation* image;
+		int order = 0;
+	};
 }

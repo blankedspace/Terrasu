@@ -7,7 +7,6 @@
 #include <iostream>
 #include "SDL.h"
 #include "bgfx/platform.h"
-#include "Scripts/Scripts.h"
 #include "imgui_impl_bgfx.h"
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
@@ -316,6 +315,16 @@ namespace Terrasu {
 		auto viewTT = m_registry.view<TransformComponent, TextUIComponent>();
 		for (auto [entity, transform, text] : viewTT.each()) {
 			m_renderer->DrawText(transform, text);
+		}
+
+		auto viewTSp = m_registry.view<TransformComponent, SpineComponent>();
+		for (auto [entity, transform, spine] : viewTSp.each()) {
+			spine.image->m_assetManager = m_assetManager.get();
+			spine.image->transform = transform.GetTransform();
+			spine.image->Update(dt * 1000);
+			spine.image->Render(*m_renderer.get());
+			//m_renderer->DrawQuad(transform, sprite.material);
+
 		}
 
 		bgfx::frame();

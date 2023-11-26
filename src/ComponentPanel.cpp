@@ -3,10 +3,9 @@
 #include "AssetManager.h"
 #include "ComponentPanel.h"
 #include "ECS/Entity.h"
-#include "Scripts/Scripts.h"
 #include "ECS/Components.h"
 #include "ECS/Scene.h"
-
+#include "Application.h"
 namespace Terrasu{
 	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f) {
 		ImGuiIO& io = ImGui::GetIO();
@@ -249,6 +248,10 @@ namespace Terrasu{
 
 				mat.uniforms.push_back(uniform);
 			}
+			if (DisplayAddComponentEntry<SpineComponent>("Spine Component")) {
+				auto& spn = m_SelectionContext->GetComponent<SpineComponent>();
+				spn.image = new SpineAnimation("mix-and-match-pro");
+			}
 			if (DisplayAddComponentEntry<NativeScriptComponent>("Empty Script")) {
 				m_SelectionContext->GetComponent<NativeScriptComponent>().Bind<NativeScript>();
 			}
@@ -281,6 +284,9 @@ namespace Terrasu{
 			ImGui::InputFloat("##camwidth", &component.width);
 			ImGui::SameLine();
 			ImGui::InputFloat("##camheight", &component.height);
+			ImGui::TreePop();
+		}
+		if (DrawComponent<SpineComponent>("Spine", entity)) {
 			ImGui::TreePop();
 		}
 		if (DrawComponent<SpriteComponent>("SpriteComponent", entity)) {
@@ -364,7 +370,7 @@ namespace Terrasu{
 			std::string s = type.name();
 			if (ImGui::BeginCombo("##combo", s.c_str())) // The second parameter is the label previewed before opening the combo.
 			{
-				for (auto factory : ScriptFactory) {
+				for (auto factory : Terrasu::Application::ScriptFactory) {
 
 					bool is_selected = (s.c_str() == factory.first.c_str()); // You can store your selection however you want, outside or inside your objects
 					if (ImGui::Selectable(factory.first.c_str(), is_selected)) {

@@ -2,12 +2,10 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "bgfx/bgfx.h"
 #include "glm/glm.hpp"
 
 #include "Shader.h"
 #include "Texture.h"
-
 
 namespace Terrasu {
 

@@ -140,4 +140,43 @@ namespace Terrasu
 
 	}
 
+	void Renderer::DrawVerts(std::vector<PosUvTileVertex>* vertexArray, const glm::mat4& transform, Material* material)
+	{
+		if (material == nullptr)
+			material = &m_assetManager->CreateMaterial("texturedQuad");
+		if (m_vbh.idx > 5000)
+		{
+			m_vbh = bgfx::createDynamicVertexBuffer(bgfx::makeRef(vertexArray->data(), vertexArray->size() * 6 * sizeof(float)), Terrasu::PosUvTileVertex::ms_layout);
+		}
+
+		bgfx::setTransform(glm::value_ptr(transform));
+		//solve not overloaded load
+		auto texture = m_assetManager->LoadTexture("Assets/mix-and-match-pro.png");
+		bgfx::setTexture(0, texture->texColor, texture->handle, BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC);
+
+
+
+
+		bgfx::update(m_vbh, 0, bgfx::makeRef(vertexArray->data(), vertexArray->size() * 6 * sizeof(float)));
+
+
+		bgfx::setVertexBuffer(0, m_vbh);
+
+
+		uint64_t state = 0
+			| BGFX_STATE_WRITE_RGB
+			| BGFX_STATE_WRITE_A
+			| BGFX_STATE_BLEND_ALPHA
+			| BGFX_STATE_DEPTH_TEST_LESS
+			| BGFX_STATE_CULL_CW
+			| BGFX_STATE_MSAA
+			;
+		// Set render states.
+		bgfx::setState(state);
+		//solve not overloaded load
+
+
+		bgfx::submit(0, material->shader.handle);
+	}
+
 }

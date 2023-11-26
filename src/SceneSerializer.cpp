@@ -1,5 +1,4 @@
 #include "ECS/SceneSerializer.h"
-#include "Scripts/Scripts.h"
 #include <fstream>
 #include "ECS/Entity.h"
 #include "ECS/Components.h"
