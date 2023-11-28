@@ -14,6 +14,10 @@
 #include <android/asset_manager_jni.h>
 
 #endif
+
+#define NANOSVG_IMPLEMENTATION
+#include "nanosvg/nanosvg.h"
+
 namespace Terrasu {
 
 #if BX_PLATFORM_ANDROID
@@ -359,5 +363,12 @@ namespace Terrasu {
 	{
 	
 	
+	}
+
+	NSVGimage* AssetManager::LoadSvg(std::string name)
+	{
+		struct NSVGimage* image;
+		image = nsvgParse(&ReadFileStr(name)[0], "px", 96);
+		return image;
 	}
 }

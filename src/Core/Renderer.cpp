@@ -1,5 +1,6 @@
 #include "bgfx/bgfx.h"
 #include "Renderer/Renderer.h"
+#include <nanovg/nanovg.h>
 namespace Terrasu {
 
 	static PosUvTileVertex quadVertices[] =
@@ -55,6 +56,7 @@ namespace Terrasu
 	Renderer::Renderer()
 	{
 		quad = new SimpleQuad();
+		m_nvg = nvgCreate(1, 0);
 	}
 	Renderer::~Renderer()
 	{
@@ -178,5 +180,56 @@ namespace Terrasu
 
 		bgfx::submit(0, material->shader.handle);
 	}
+
+	void Renderer::DrawSvg(const TransformComponent& transform, const SpriteSVGComponent& svg, float w, float h, const CameraComponent& camera)
+	{
+
+		float hafw = camera.width / 2;
+		float hafh = camera.height / 2;
+		float xs = ((transform.Scale.x / hafw) * w / 750);
+		float ys = (transform.Scale.y / hafh * h / 750);
+
+
+
+		float x = -svg.image->width / camera.width + transform.Translation.x * w / hafw / 4 + w / 2;
+		float y = svg.image->height / camera.height + transform.Translation.y * h / hafh / 4 - h / 2;
+		auto shape = svg.image->shapes;
+
+		int Blue = shape->fill.color & 255;
+		int Green = (shape->fill.color >> 8) & 255;
+		int Red = (shape->fill.color >> 16) & 255;
+
+		nvgFillColor(m_nvg, nvgRGBf(Red, Green, Blue));
+		nvgStrokeColor(m_nvg, nvgRGBf(Red, Green, Blue));
+		nvgStrokeWidth(m_nvg, shape->strokeWidth);
+
+		for (auto path = shape->paths; path != NULL; path = path->next) {
+			nvgBeginPath(m_nvg);
+			nvgMoveTo(m_nvg, path->pts[0] * xs + x, path->pts[1] * ys - y);
+
+
+			for (int i = 0; i < path->npts - 1; i += 3) {
+
+				float* p = &path->pts[i * 2];
+
+				nvgBezierTo(m_nvg,
+					p[2] * xs + x,
+					p[3] * ys - y,
+					p[4] * xs + x,
+					p[5] * ys - y,
+					p[6] * xs + x,
+					p[7] * ys - y);
+			}
+			if (path->closed)
+				nvgLineTo(m_nvg, path->pts[0] * xs + x, path->pts[1] * ys - y);
+
+			if (shape->fill.type)
+				nvgFill(m_nvg);
+
+			if (shape->stroke.type)
+				nvgStroke(m_nvg);
+		}
+	}
+
 
 }

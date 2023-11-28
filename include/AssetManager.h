@@ -8,7 +8,7 @@
 #include "bimg/bimg.h"
 #include <unordered_map>
 
-
+struct NSVGimage;
 namespace Terrasu {
 
 	typedef struct {
@@ -32,6 +32,7 @@ namespace Terrasu {
 			bgfx::UniformHandle CreateUniformHandle(std::string name);
 			AudioData* LoadAudioFile(std::string Filepath);
 			void HotReload();
+			NSVGimage* LoadSvg(std::string name);
 		private:
 			const bgfx::Memory* loadMem(const char* _filePath);
 			bgfx::ShaderHandle loadShaderHandle(const char* _name);

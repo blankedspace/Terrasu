@@ -264,6 +264,9 @@ namespace Terrasu{
 			if (DisplayAddComponentEntry<TextUIComponent>("TextUI")) {
 
 			}
+			if (DisplayAddComponentEntry<SpriteSVGComponent>("SpriteSVGComponent")) {
+				m_SelectionContext->GetComponent<SpriteSVGComponent>().image = m_assetManager->LoadSvg("Assets/play.svg");
+			}
 
 
 			ImGui::EndPopup();
@@ -278,6 +281,14 @@ namespace Terrasu{
 			DrawVec3Control("Rotation", rotation);
 			component.Rotation = glm::radians(rotation);
 			DrawVec3Control("Scale", component.Scale, 1.0f);
+			ImGui::TreePop();
+		}
+
+		if (DrawComponent<SpriteSVGComponent>("SpriteSVGComponent", entity)) {
+
+			auto& component = entity.GetComponent<SpriteSVGComponent>();
+
+			ImGui::InputInt("##order", &component.order);
 			ImGui::TreePop();
 		}
 		if (DrawComponent<CameraComponent>("Camera", entity)) {

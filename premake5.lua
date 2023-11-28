@@ -10,6 +10,7 @@ project "Terrasu"
 
    files {
    "include/**.h", 
+   "include/**.cpp", 
    "src/**.h", 
    "src/**.cpp",
    "3rdParty/imgui/*.cpp",

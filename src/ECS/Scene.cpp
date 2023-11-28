@@ -329,7 +329,13 @@ namespace Terrasu {
 			//m_renderer->DrawQuad(transform, sprite.material);
 
 		}
+		nvgBeginFrame(m_renderer->m_nvg, float(m_screenwidth), float(m_screenheight), 1.0f);
+		auto viewTSV = m_registry.view<TransformComponent, SpriteSVGComponent>();
+		for (auto [entity, transform, svg] : viewTSV.each()) {
+			m_renderer->DrawSvg(transform, svg, float(m_screenwidth), float(m_screenheight), cam);
+		}
 
+		nvgEndFrame(m_renderer->m_nvg);
 		bgfx::frame();
 
 		Uint64 end = SDL_GetPerformanceCounter();

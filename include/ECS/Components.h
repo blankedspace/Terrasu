@@ -7,6 +7,7 @@
 #include "Renderer/Vertex.h"
 #include "Asset/SpineAnimation.h"
 #include <unordered_map>
+#include <nanosvg/nanosvg.h>
 namespace Terrasu {
 
 	struct TransformComponent {
@@ -178,5 +179,12 @@ namespace Terrasu {
 	public:
 		SpineAnimation* image;
 		int order = 0;
+	};
+
+	struct SpriteSVGComponent {
+	public:
+		NSVGimage* image;
+		int order = 0;
+
 	};
 }
