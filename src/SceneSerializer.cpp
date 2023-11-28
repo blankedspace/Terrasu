@@ -228,6 +228,16 @@ namespace Terrasu {
 
 			out << YAML::EndMap; // ColiderComponent
 		}
+		if (entity.HasComponent<SpineComponent>())
+		{
+			out << YAML::Key << "SpineComponent";
+			out << YAML::BeginMap; // SpineComponent
+
+			auto& Name = entity.GetComponent<SpineComponent>().image->mName;
+			out << YAML::Key << "Name" << YAML::Value << Name;
+
+			out << YAML::EndMap; // SpineComponent
+		}
 		out << YAML::EndMap; // Entity
 	}
 	bool SceneSerializer::Deserialize(const std::string& filepath)
@@ -334,6 +344,14 @@ namespace Terrasu {
 			auto& src = deserializedEntity.AddComponent<SimplePhysicsComponent>();
 			src.Rect = coliderComponent["Rect"].as<glm::vec4>();
 		}
+		auto spineComponent = entity["SpineComponent"];
+		if (spineComponent)
+		{
+			auto& src = deserializedEntity.AddComponent<SpineComponent>();
+			src.image = new SpineAnimation(spineComponent["Name"].as<std::string>());
+
+		}
+
 
 		return deserializedEntity;
 	}

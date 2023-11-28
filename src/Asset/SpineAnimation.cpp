@@ -65,7 +65,7 @@ namespace Terrasu {
 		mSkeleton->setPosition(0, 0);
 		mSkeleton->updateWorldTransform();
 
-		mState->setAnimation(0, "dance", true);
+		mState->setAnimation(0, "idle", true);
 		//spSkeleton_update(mSkeleton, 0);
 		mPlaying = true;
 
@@ -195,6 +195,61 @@ namespace Terrasu {
 		//target.draw(*vertexArray, states);
 		clipper.clipEnd();
 
+	}
+
+	void SpineAnimation::Change(const std::string& name)
+	{
+		auto ass = Terrasu::AssetManager();
+		auto s = ass.ReadFileStr("Assets/" + name + ".json");
+		if(s == "")
+		{
+			return;
+		}
+		mAtlas = new SpineAtlas(name, ass);// gAnimationHost.GetAtlas(mName);
+
+		spine::SkeletonJson* skeletonJson = new spine::SkeletonJson(mAtlas->mAtlas);
+		spine::SkeletonData* skeletonData = skeletonJson->readSkeletonData(s.c_str());
+		assert(skeletonData);
+		delete skeletonJson;
+
+		spine::Bone::setYDown(true);
+		//worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
+
+
+
+		mSkeleton = new spine::Skeleton(skeletonData);
+		mStateData = new spine::AnimationStateData(skeletonData);
+		mState = new spine::AnimationState(mStateData);
+		mState->setRendererObject(this);
+
+		auto Animation = mStateData->getSkeletonData()->findAnimation("walk");
+		mState->setAnimation(0, Animation, true);
+
+		spine::Skin skin("mix-and-match");
+		
+
+		skin.addSkin(skeletonData->findSkin("nose/short"));
+		skin.addSkin(skeletonData->findSkin("eyelids/girly"));
+		skin.addSkin(skeletonData->findSkin("eyes/violet"));
+		skin.addSkin(skeletonData->findSkin("hair/blue"));
+		skin.addSkin(skeletonData->findSkin("clothes/hoodie-orange"));
+		skin.addSkin(skeletonData->findSkin("legs/pants-jeans"));
+		skin.addSkin(skeletonData->findSkin("accessories/bag"));
+		skin.addSkin(skeletonData->findSkin("accessories/hat-red-yellow"));
+
+		mSkeleton->setSkin(&skin);
+
+		mSkeleton->setSlotsToSetupPose();
+		mSkeleton->updateWorldTransform();
+
+		mSkeleton->setSlotsToSetupPose();
+
+		mSkeleton->setPosition(0, 0);
+		mSkeleton->updateWorldTransform();
+
+		mState->setAnimation(0, "dance", true);
+		//spSkeleton_update(mSkeleton, 0);
+		mPlaying = true;
 	}
 
 }

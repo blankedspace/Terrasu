@@ -20,6 +20,7 @@
 
 #include <chrono>
 #include <ctime>
+#include <Sound/SoundManager.h>
 namespace Terrasu {
 	Entity Scene::AddEntity(std::string tag)
 	{
@@ -160,7 +161,7 @@ namespace Terrasu {
 		};
 
 		
-
+		PlaySoundTr(nullptr);
 		auto viewNS = m_registry.view<NativeScriptComponent>();
 		for (auto [ent, script] : viewNS.each()) {
 
@@ -321,7 +322,9 @@ namespace Terrasu {
 		for (auto [entity, transform, spine] : viewTSp.each()) {
 			spine.image->m_assetManager = m_assetManager.get();
 			spine.image->transform = transform.GetTransform();
-			spine.image->Update(dt * 1000);
+			if (Runtime) {
+				spine.image->Update(dt * 1000);
+			}
 			spine.image->Render(*m_renderer.get());
 			//m_renderer->DrawQuad(transform, sprite.material);
 

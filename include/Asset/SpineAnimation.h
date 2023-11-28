@@ -31,22 +31,24 @@ namespace Terrasu {
 
 		void			Update(float timeElapsed);
 		void			Render(Renderer& m_renderer);
-
+		void			Change(const std::string& name);
 		void			Play(const std::string& skin, const std::string& animation, bool looped);
 		void			Stop();
 		Terrasu::AssetManager* m_assetManager;
 		void			OnAnimationEvent(spine::AnimationState* state, int trackIndex, int type, spine::Event* event, int loopCount);
 		glm::mat4 transform;
+		std::string		mName;
+		spine::Skeleton* mSkeleton;
 	private:
 		spine::Animation* GetAnimation(const std::string& name) const;
 		void			FillSlotVertices(PosUvTileVertex* points, float x, float y, spine::Slot* slot, spine::RegionAttachment* attachment);
 
-		std::string		mName;
+
 		std::string		mCurrentAnimation;
 		SpineAtlas* mAtlas;
 		spine::AnimationState* mState;
 		spine::AnimationStateData* mStateData;
-		spine::Skeleton* mSkeleton;
+	
 
 		spine::SkeletonClipping clipper;
 		spine::Vector<float> worldVertices;

@@ -6,6 +6,7 @@
 #include "ECS/Components.h"
 #include "ECS/Scene.h"
 #include "Application.h"
+#include "spine/Skin.h"
 namespace Terrasu{
 	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f) {
 		ImGuiIO& io = ImGui::GetIO();
@@ -250,6 +251,8 @@ namespace Terrasu{
 			}
 			if (DisplayAddComponentEntry<SpineComponent>("Spine Component")) {
 				auto& spn = m_SelectionContext->GetComponent<SpineComponent>();
+
+
 				spn.image = new SpineAnimation("mix-and-match-pro");
 			}
 			if (DisplayAddComponentEntry<NativeScriptComponent>("Empty Script")) {
@@ -287,6 +290,28 @@ namespace Terrasu{
 			ImGui::TreePop();
 		}
 		if (DrawComponent<SpineComponent>("Spine", entity)) {
+			auto& spn = entity.GetComponent<SpineComponent>();
+			char* buffer = strdup(spn.image->mName.c_str());
+			if (ImGui::InputText("##Name", buffer, 99)) {
+				spn.image->Change(spn.image->mName);
+			}
+
+			auto skins = spn.image->mSkeleton->getData()->getSkins();
+			for (int i=0;i<skins.size();i++) {
+				auto s = skins[i]->getName().buffer();
+				auto ss = strdup(s);
+				if (ImGui::InputText(s, ss, 99)) {
+				}
+			}
+
+			auto animations = spn.image->mSkeleton->getData()->getAnimations();
+			for (int i = 0; i < animations.size(); i++) {
+				auto s = animations[i]->getName().buffer();
+				auto ss = strdup(s);
+				if (ImGui::InputText(s, ss, 99)) {
+				}
+			}
+
 			ImGui::TreePop();
 		}
 		if (DrawComponent<SpriteComponent>("SpriteComponent", entity)) {

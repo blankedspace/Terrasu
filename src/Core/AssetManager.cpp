@@ -329,10 +329,22 @@ namespace Terrasu {
 	std::string AssetManager::ReadFileStr(std::string Filepath)
 	{
 		auto mem = loadMem(Filepath.c_str());
-	
+		if (mem == NULL){
+			return "";
+		}
 		std::string s((char*)mem->data, mem->size - 1);
 		delete mem;
 		return s;
+	}
+
+	Terrasu::AudioData* AssetManager::LoadAudioFile(std::string Filepath)
+	{
+		AudioData* data = new AudioData();
+		auto mem = loadMem(Filepath.c_str());
+		data->data = mem->data;
+		data->dataSize = mem->size;
+		data->currentPosition = 0;
+		return data;
 	}
 	bgfx::UniformHandle AssetManager::CreateUniformHandle(std::string name)
 	{
