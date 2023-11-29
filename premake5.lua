@@ -34,8 +34,13 @@ project "Terrasu"
    }
     libdirs
     {
+		"3rdParty",
 	    "3rdParty/bgfx/.build/win64_vs2017/bin"
     }
+	links
+	{
+		"rlottie"
+	}
     buildoptions 
 	{
 		"/Zc:__cplusplus",

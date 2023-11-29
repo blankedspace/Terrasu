@@ -238,6 +238,17 @@ namespace Terrasu {
 
 			out << YAML::EndMap; // SpineComponent
 		}
+
+		if (entity.HasComponent<SpriteSVGComponent>())
+		{
+			out << YAML::Key << "SpriteSVGComponent";
+			out << YAML::BeginMap; // SpriteSVGComponent
+
+			auto& Name = entity.GetComponent<SpriteSVGComponent>().name;
+			out << YAML::Key << "Name" << YAML::Value << Name;
+
+			out << YAML::EndMap; // SpriteSVGComponent
+		}
 		out << YAML::EndMap; // Entity
 	}
 	bool SceneSerializer::Deserialize(const std::string& filepath)
@@ -351,7 +362,13 @@ namespace Terrasu {
 			src.image = new SpineAnimation(spineComponent["Name"].as<std::string>());
 
 		}
-
+		auto spriteSVGComponent = entity["SpriteSVGComponent"];
+		if (spriteSVGComponent)
+		{
+			auto& src = deserializedEntity.AddComponent<SpriteSVGComponent>();
+			src.name = spriteSVGComponent["Name"].as<std::string>();
+			src.image = m_assetManager->LoadSvg(src.name);
+		}
 
 		return deserializedEntity;
 	}

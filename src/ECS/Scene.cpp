@@ -238,6 +238,13 @@ namespace Terrasu {
 		TransformComponent camtr = camera.GetComponent<TransformComponent>();
 		{
 			float view[16];
+			bgfx::setViewClear(0
+				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
+				, cam.backgroundcolor
+				, 1.0f
+				, 0
+			);
+
 			bx::mtxLookAt(view, { cam.eye.x,cam.eye.y,cam.eye.z }, { camtr.Translation.x, camtr.Translation.y, camtr.Translation.z });
 
 			float proj[16];
@@ -327,6 +334,36 @@ namespace Terrasu {
 			}
 			spine.image->Render(*m_renderer.get());
 			//m_renderer->DrawQuad(transform, sprite.material);
+
+		}
+
+
+		auto viewTLt = m_registry.view<TransformComponent, SpriteLottieComponent>();
+		for (auto [entity, transform, lottie] : viewTLt.each()) {
+			lottie.order += 1;
+			if (lottie.order > lottie.image->totalFrame())
+			{
+				lottie.order = 0;
+			}
+			lottie.image->renderSync(lottie.order,*lottie.surface);
+
+			auto mat = m_assetManager->CreateMaterial("texturedQuad");
+			lottie.surface->buffer();
+			auto mem = bgfx::makeRef(lottie.surface->buffer(), lottie.surface->height() * lottie.surface->bytesPerLine());
+			auto handle = bgfx::createTexture2D(
+				uint16_t(lottie.surface->width())
+				, uint16_t(lottie.surface->height())
+				, 1 < 1
+				, 1
+				, bgfx::TextureFormat::Enum::BGRA8
+				, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE
+				, mem
+			);
+			Texture* tex = new Texture();
+			tex->handle = handle;
+			tex->texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+			mat.textures.push_back(*tex);
+			m_renderer->DrawQuad(transform, mat);
 
 		}
 		nvgBeginFrame(m_renderer->m_nvg, float(m_screenwidth), float(m_screenheight), 1.0f);

@@ -8,6 +8,7 @@
 #include "Asset/SpineAnimation.h"
 #include <unordered_map>
 #include <nanosvg/nanosvg.h>
+#include "rlottie/rlottie.h"
 namespace Terrasu {
 
 	struct TransformComponent {
@@ -159,6 +160,7 @@ namespace Terrasu {
 
 	struct CameraComponent {
 	public:
+		uint32_t backgroundcolor;
 		glm::vec3 eye = { 0.0f, 0.0f, -25.0f };
 		float width = 32, height = 18;
 	};
@@ -183,7 +185,17 @@ namespace Terrasu {
 
 	struct SpriteSVGComponent {
 	public:
+		std::string name;
 		NSVGimage* image;
+		int order = 0;
+
+	};
+	struct SpriteLottieComponent {
+	public:
+		std::unique_ptr<rlottie::Animation> image;
+		rlottie::Surface* surface;
+		std::unique_ptr<uint32_t[]> buffer;
+
 		int order = 0;
 
 	};

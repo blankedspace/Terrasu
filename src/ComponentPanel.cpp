@@ -8,6 +8,7 @@
 #include "Application.h"
 #include "spine/Skin.h"
 namespace Terrasu{
+
 	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f) {
 		ImGuiIO& io = ImGui::GetIO();
 		auto boldFont = io.Fonts->Fonts[0];
@@ -266,8 +267,24 @@ namespace Terrasu{
 			}
 			if (DisplayAddComponentEntry<SpriteSVGComponent>("SpriteSVGComponent")) {
 				m_SelectionContext->GetComponent<SpriteSVGComponent>().image = m_assetManager->LoadSvg("Assets/play.svg");
+				m_SelectionContext->GetComponent<SpriteSVGComponent>().name = "Assets/play.svg";
 			}
+			if (DisplayAddComponentEntry<SpriteLottieComponent>("SpriteLottieComponent")) {
+				auto json = m_assetManager->ReadFileStr("Assets/test.json");
+				std::string key = "cat";
+				m_SelectionContext->GetComponent<SpriteLottieComponent>().image = rlottie::Animation::loadFromData(json,key);
+				auto t = m_SelectionContext->GetComponent<SpriteLottieComponent>().image.get();
+				
+				auto w = 100;
+				auto h = 100;
+				m_SelectionContext->GetComponent<SpriteLottieComponent>().buffer = std::unique_ptr<uint32_t[]>(new uint32_t[w * h]);
 
+				m_SelectionContext->GetComponent<SpriteLottieComponent>().surface 
+					= new rlottie::Surface(m_SelectionContext->GetComponent<SpriteLottieComponent>().buffer.get(), w, h, w * 4);
+
+				m_SelectionContext->GetComponent<SpriteLottieComponent>().image->renderSync(1,
+					*m_SelectionContext->GetComponent<SpriteLottieComponent>().surface);
+			}
 
 			ImGui::EndPopup();
 		}
@@ -289,12 +306,22 @@ namespace Terrasu{
 			auto& component = entity.GetComponent<SpriteSVGComponent>();
 
 			ImGui::InputInt("##order", &component.order);
+
+			char* buffer = strdup(component.name.c_str());
+			if (ImGui::InputText("##Name", buffer, 99)) {
+				component.name = std::string(buffer);
+			}
+
 			ImGui::TreePop();
 		}
 		if (DrawComponent<CameraComponent>("Camera", entity)) {
 		
 			auto& component = entity.GetComponent<CameraComponent>();
 			DrawVec3Control("Eye", component.eye);
+
+			int col = (int)component.backgroundcolor;
+			ImGui::InputInt("##backgroundcolor", &(col));
+			component.backgroundcolor = col;
 			ImGui::InputFloat("##camwidth", &component.width);
 			ImGui::SameLine();
 			ImGui::InputFloat("##camheight", &component.height);

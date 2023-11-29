@@ -193,41 +193,43 @@ namespace Terrasu
 
 		float x = -svg.image->width / camera.width + transform.Translation.x * w / hafw / 4 + w / 2;
 		float y = svg.image->height / camera.height + transform.Translation.y * h / hafh / 4 - h / 2;
-		auto shape = svg.image->shapes;
+		
+		for (auto shape = svg.image->shapes; shape != NULL; shape = shape->next) {
+			int Blue = shape->fill.color & 255;
+			int Green = (shape->fill.color >> 8) & 255;
+			int Red = (shape->fill.color >> 16) & 255;
 
-		int Blue = shape->fill.color & 255;
-		int Green = (shape->fill.color >> 8) & 255;
-		int Red = (shape->fill.color >> 16) & 255;
+			nvgFillColor(m_nvg, nvgRGBf(Red, Green, Blue));
+			nvgStrokeColor(m_nvg, nvgRGBf(Red, Green, Blue));
+			nvgStrokeWidth(m_nvg, shape->strokeWidth);
 
-		nvgFillColor(m_nvg, nvgRGBf(Red, Green, Blue));
-		nvgStrokeColor(m_nvg, nvgRGBf(Red, Green, Blue));
-		nvgStrokeWidth(m_nvg, shape->strokeWidth);
-
-		for (auto path = shape->paths; path != NULL; path = path->next) {
-			nvgBeginPath(m_nvg);
-			nvgMoveTo(m_nvg, path->pts[0] * xs + x, path->pts[1] * ys - y);
+			for (auto path = shape->paths; path != NULL; path = path->next) {
+				nvgBeginPath(m_nvg);
+				nvgMoveTo(m_nvg, path->pts[0] * xs + x, path->pts[1] * ys - y);
 
 
-			for (int i = 0; i < path->npts - 1; i += 3) {
+				for (int i = 0; i < path->npts - 1; i += 3) {
 
-				float* p = &path->pts[i * 2];
+					float* p = &path->pts[i * 2];
 
-				nvgBezierTo(m_nvg,
-					p[2] * xs + x,
-					p[3] * ys - y,
-					p[4] * xs + x,
-					p[5] * ys - y,
-					p[6] * xs + x,
-					p[7] * ys - y);
+					nvgBezierTo(m_nvg,
+						p[2] * xs + x,
+						p[3] * ys - y,
+						p[4] * xs + x,
+						p[5] * ys - y,
+						p[6] * xs + x,
+						p[7] * ys - y);
+				}
+				if (path->closed)
+					nvgLineTo(m_nvg, path->pts[0] * xs + x, path->pts[1] * ys - y);
+
+				if (shape->fill.type)
+					nvgFill(m_nvg);
+
+				if (shape->stroke.type)
+					nvgStroke(m_nvg);
 			}
-			if (path->closed)
-				nvgLineTo(m_nvg, path->pts[0] * xs + x, path->pts[1] * ys - y);
 
-			if (shape->fill.type)
-				nvgFill(m_nvg);
-
-			if (shape->stroke.type)
-				nvgStroke(m_nvg);
 		}
 	}
 

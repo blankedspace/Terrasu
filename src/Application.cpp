@@ -60,7 +60,7 @@ namespace Terrasu
 #endif
 		init.resolution.width = m_width;
 		init.resolution.height = m_height;
-		init.resolution.reset = BGFX_RESET_VSYNC;
+		init.resolution.reset = BGFX_RESET_NONE;
 		bgfx::init(init);
 		bgfx::setViewClear(0
 			, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
@@ -148,7 +148,7 @@ namespace Terrasu
 						m_activeScene->m_screenheight = m_height;
 						m_activeScene->m_screenwidth = m_width;
 
-						bgfx::reset(m_width, m_height, BGFX_RESET_VSYNC);
+						bgfx::reset(m_width, m_height, BGFX_RESET_NONE);
 						//bgfx::setViewRect(0, 0, 0, m_width, m_height);
 						break;
 					}
