@@ -1,7 +1,7 @@
 #pragma once
 #include "glm/glm.hpp"
 namespace Terrasu {
-	bool AABB(glm::vec2 first, glm::vec2 second, float widthf, float heightf, float widths, float heights)
+	inline bool AABB(glm::vec2 first, glm::vec2 second, float widthf, float heightf, float widths, float heights)
 	{
 
 		float Aleft = first.x - widthf;
@@ -24,7 +24,7 @@ namespace Terrasu {
 		return (!(AisToTheRightOfB || AisToTheLeftOfB || AisAboveB ||AisBelowB));
 	
 	}
-	glm::vec2 AABBnormal(glm::vec2 first, glm::vec2 second, float widthf, float heightf, float widths, float heights, float delta)
+	inline glm::vec2 AABBnormal(glm::vec2 first, glm::vec2 second, float widthf, float heightf, float widths, float heights, float delta)
 	{
 
 		float Aleft = first.x - widthf;

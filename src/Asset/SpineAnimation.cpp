@@ -35,12 +35,11 @@ namespace Terrasu {
 		//worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 
 
-
+		height = skeletonData->getHeight();
 		mSkeleton = new spine::Skeleton(skeletonData);
 		mStateData = new spine::AnimationStateData(skeletonData);
 		mState = new spine::AnimationState(mStateData);
 		mState->setRendererObject(this);
-
 		auto Animation = mStateData->getSkeletonData()->findAnimation("walk");
 		mState->setAnimation(0, Animation, true);
 
@@ -61,7 +60,7 @@ namespace Terrasu {
 		mSkeleton->updateWorldTransform();
 
 		mSkeleton->setSlotsToSetupPose();
-
+		
 		mSkeleton->setPosition(0, 0);
 		mSkeleton->updateWorldTransform();
 
@@ -177,8 +176,8 @@ namespace Terrasu {
 
 			for (int ii = 0; ii < indicesCount; ++ii) {
 				int index = (*indices)[ii] << 1;
-				vertex.m_x = (*vertices)[index] / 300;
-				vertex.m_y = (*vertices)[index + 1] / 300;
+				vertex.m_x = (*vertices)[index] / height;
+				vertex.m_y = (*vertices)[index + 1] / height;
 				vertex.uv_x = (*uvs)[index];
 				vertex.uv_y = (*uvs)[index + 1];
 				vertex.m_xTile = 1;

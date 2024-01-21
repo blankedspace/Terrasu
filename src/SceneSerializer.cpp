@@ -4,6 +4,7 @@
 #include "ECS/Components.h"
 #include <iostream>
 #include "Application.h"
+#include <UUID.h>
 namespace YAML {
 
 	template<>
@@ -133,7 +134,7 @@ namespace Terrasu {
 	{
 
 		out << YAML::BeginMap; // Entity
-		out << YAML::Key << "Entity" << YAML::Value << 1234214;
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetComponent<TagComponent>().UUID;
 
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -155,6 +156,16 @@ namespace Terrasu {
 			out << YAML::Key << "Translation" << YAML::Value << tc.Translation;
 			out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
 			out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
+
+			if (entity.GetComponent<TransformComponent>().parent != -1) {
+				Entity entp{ (entt::entity)entity.GetComponent<TransformComponent>().parent, m_scene };
+				out << YAML::Key << "Parent" << YAML::Value << entp.GetComponent<TagComponent>().UUID;
+			}
+			else
+			{
+				out << YAML::Key << "Parent" << YAML::Value << "None";
+			}
+
 
 			out << YAML::EndMap; // TransformComponent
 		}
@@ -239,17 +250,132 @@ namespace Terrasu {
 			out << YAML::EndMap; // SpineComponent
 		}
 
-		if (entity.HasComponent<SpriteSVGComponent>())
+		if (entity.HasComponent<SvgComponent>())
 		{
 			out << YAML::Key << "SpriteSVGComponent";
 			out << YAML::BeginMap; // SpriteSVGComponent
 
-			auto& Name = entity.GetComponent<SpriteSVGComponent>().name;
-			out << YAML::Key << "Name" << YAML::Value << Name;
+			auto& svg = entity.GetComponent<SvgComponent>();
+			out << YAML::Key << "Name" << YAML::Value << svg.name;
+			out << YAML::Key << "Order" << YAML::Value << svg.order;
 
 			out << YAML::EndMap; // SpriteSVGComponent
 		}
+		if (entity.HasComponent<TextComponent>())
+		{
+			out << YAML::Key << "TextComponent";
+			out << YAML::BeginMap; // TextComponent
+
+			auto& text = entity.GetComponent<TextComponent>();
+			out << YAML::Key << "text" << YAML::Value << text.text->m_text.c_str();
+			out << YAML::Key << "Order" << YAML::Value << text.order;
+
+			out << YAML::EndMap; // TextComponent
+		}
 		out << YAML::EndMap; // Entity
+	}
+	
+	
+	std::vector<uint32_t> SceneSerializer::getAllDescendants(uint32_t entityID) {
+
+		std::vector<uint32_t> descendants;
+		Entity entity{ (entt::entity)entityID, m_scene };
+		auto directChildren = entity.GetComponent<TransformComponent>().children;
+
+		for (auto child : directChildren) {
+			descendants.push_back(child);
+			auto vec = getAllDescendants(child);
+			descendants.insert(descendants.begin(),vec.begin(),vec.end());  // Recursive call
+		}
+		return descendants;
+	}
+	void SceneSerializer::SerializePrefab(Entity& entity)
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Prefab" << YAML::Value << "Untitled";
+		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+
+		entity.GetComponent<TagComponent>().UUID = generate_uuid_v4();
+		auto descendants = getAllDescendants(entity.GetId());
+		SerializeEntity(out, entity);
+		for (auto entityID : descendants) {
+			Entity entity{(entt::entity)entityID,m_scene };
+			entity.GetComponent<TagComponent>().UUID = generate_uuid_v4();
+			
+		};
+		for (auto entityID : descendants) {
+			Entity entity{ (entt::entity)entityID,m_scene };
+			SerializeEntity(out, entity);
+
+		};
+		entity.GetComponent<TagComponent>().UUID = generate_uuid_v4();
+		for (auto entityID : descendants) {
+			Entity entity{ (entt::entity)entityID,m_scene };
+			entity.GetComponent<TagComponent>().UUID = generate_uuid_v4();
+
+		};
+	
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+
+		m_assetManager->WriteFileStr("Assets/" + entity.GetComponent<TagComponent>().tag + ".prefab", out.c_str());
+
+	}
+
+	Entity SceneSerializer::DeserializePrefab(const std::string& filepath) {
+		YAML::Node data;
+		std::string s = m_assetManager->ReadFileStr(filepath);
+		data = YAML::Load(s);
+
+		std::string prefabName = data["Prefab"].as<std::string>();
+		auto entities = data["Entities"];
+		std::vector<Entity> Entities;
+		if (entities)
+		{
+			for (auto entity : entities)
+			{
+
+				Entities.push_back(DeserializeEntity(entity));
+
+			}
+		}
+
+		//TODO: change UUIDs
+		auto viewT = m_scene->m_registry.view<TransformComponent>();
+		for (auto ent: Entities) {
+			auto viewT = m_scene->m_registry.view<TagComponent, TransformComponent>();
+			for (auto ent2 : Entities) {
+
+				if (ent.GetComponent<TransformComponent>().parentuuid == ent2.GetComponent<TagComponent>().UUID)
+				{
+					ent.GetComponent<TransformComponent>().parent = (uint32_t)ent2.GetId();
+					ent2.GetComponent<TransformComponent>().children.insert((uint32_t)ent.GetId());
+				}
+			}
+		}
+		auto viewNS = m_scene->m_registry.view<NativeScriptComponent>();
+		std::vector<NativeScript*> toCreate;
+		for (auto [ent, script] : viewNS.each()) {
+
+			if (!script.Instance) {
+
+				script.Instance = script.InstantiateScript();
+				script.Instance->entity.m_entity = ent;
+				script.Instance->entity.m_scene = m_scene;
+				toCreate.push_back(script.Instance);
+			}
+		}
+
+		for (auto script : toCreate) {
+			script->OnCreate();
+		}
+
+		for (auto ent : Entities) {
+			if(ent.GetComponent<TransformComponent>().parent == -1)
+				return ent;
+
+		}
 	}
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
@@ -267,6 +393,18 @@ namespace Terrasu {
 				DeserializeEntity(entity);
 
 			}
+
+			auto viewT = m_scene->m_registry.view<TransformComponent>();
+			for (auto [ent, transform] : viewT.each()) {
+				auto viewT = m_scene->m_registry.view<TagComponent,TransformComponent>();
+				for (auto [entp, tag, transformP] : viewT.each()) {
+					if (transform.parentuuid == tag.UUID)
+					{
+						transform.parent = (uint32_t)entp;
+						transformP.children.insert((uint32_t)ent);
+					}
+				}
+			}
 		}
 
 		return true;
@@ -274,7 +412,7 @@ namespace Terrasu {
 	}
 	Entity SceneSerializer::DeserializeEntity(YAML::Node entity)
 	{
-		uint64_t uuid = entity["Entity"].as<uint64_t>();
+		std::string uuid = entity["Entity"].as<std::string>();
 
 		std::string name;
 		auto tagComponent = entity["TagComponent"];
@@ -282,7 +420,7 @@ namespace Terrasu {
 			name = tagComponent["Tag"].as<std::string>();
 
 
-		Entity deserializedEntity = m_scene->AddEntity(name);
+		Entity deserializedEntity = m_scene->AddEntity(name, uuid);
 
 		auto transformComponent = entity["TransformComponent"];
 		if (transformComponent)
@@ -292,6 +430,8 @@ namespace Terrasu {
 			tc.Translation = transformComponent["Translation"].as<glm::vec3>();
 			tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
 			tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+			tc.parentuuid = transformComponent["Parent"].as<std::string>();
+
 		}
 
 
@@ -365,11 +505,23 @@ namespace Terrasu {
 		auto spriteSVGComponent = entity["SpriteSVGComponent"];
 		if (spriteSVGComponent)
 		{
-			auto& src = deserializedEntity.AddComponent<SpriteSVGComponent>();
-			src.name = spriteSVGComponent["Name"].as<std::string>();
-			src.image = m_assetManager->LoadSvg(src.name);
+			SvgComponent* src = &deserializedEntity.AddComponent<SvgComponent>();
+			src->name = spriteSVGComponent["Name"].as<std::string>();
+			src->order = spriteSVGComponent["Order"].as<int>();
+			src->image = m_assetManager->LoadSvg(src->name);
+			
 		}
 
+		auto textComponent = entity["TextComponent"];
+		if (textComponent)
+		{
+			auto& src = deserializedEntity.AddComponent<TextComponent>();
+			src.text = m_assetManager->CreateText();
+			auto str = textComponent["text"].as<std::string>();
+			src.text->m_text = std::wstring(str.begin(),str.end());
+			src.order = textComponent["Order"].as<int>();
+			
+		}
 		return deserializedEntity;
 	}
 }

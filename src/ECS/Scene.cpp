@@ -21,14 +21,21 @@
 #include <chrono>
 #include <ctime>
 #include <Sound/SoundManager.h>
+
+#include "UUID.h"
 namespace Terrasu {
 	Entity Scene::AddEntity(std::string tag)
 	{
-		Entity ent{ m_registry.create(), this };
+		return AddEntity(tag, generate_uuid_v4());
+	}
+	Entity Scene::AddEntity(std::string tag, std::string uuid)
+	{
+		Entity* ent = new Entity{ m_registry.create(), this };
 
-		ent.AddComponent<TagComponent>().tag = tag;
-		ent.AddComponent<TransformComponent>();
-		return ent;
+		ent->AddComponent<TagComponent>().tag = tag;
+		ent->GetComponent<TagComponent>().UUID = uuid;
+		ent->AddComponent<TransformComponent>();
+		return *ent;
 	}
 
 	Entity Scene::AddEntity(Entity& ent)
@@ -85,7 +92,7 @@ namespace Terrasu {
 		m_componentPanel = std::make_unique<ComponentPanel>();
 		m_componentPanel->m_scene = this;
 		m_componentPanel->m_assetManager = m_assetManager.get();
-
+		m_componentPanel->m_sceneSerializer = new SceneSerializer(m_assetManager.get(),this );
 		m_colisionFunction = [this]()
 		{
 			
@@ -161,7 +168,7 @@ namespace Terrasu {
 		};
 
 		
-		PlaySoundTr(nullptr);
+
 		auto viewNS = m_registry.view<NativeScriptComponent>();
 		for (auto [ent, script] : viewNS.each()) {
 
@@ -231,9 +238,14 @@ namespace Terrasu {
 #endif // BX_CONFIG_DEBUG
 
 		//camera
+
+
+
 		Entity camera{ m_registry.view<CameraComponent>()[0],this };
-		CameraComponent cam = camera.GetComponent<CameraComponent>();
+		CameraComponent& cam = camera.GetComponent<CameraComponent>();
 		cam.width = cam.height * m_screenwidth/m_screenheight;
+		cam.screen_h = m_screenheight;
+		cam.scren_w = m_screenwidth;
 
 		TransformComponent camtr = camera.GetComponent<TransformComponent>();
 		{
@@ -246,8 +258,9 @@ namespace Terrasu {
 			);
 
 			bx::mtxLookAt(view, { cam.eye.x,cam.eye.y,cam.eye.z }, { camtr.Translation.x, camtr.Translation.y, camtr.Translation.z });
-
+			
 			float proj[16];
+			//bx::mtxOrtho(ortho, centering, m_width + centering, m_height + centering, centering, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 			bx::mtxOrtho(proj, -cam.width, cam.width, -cam.height, cam.height, 0.1f, 100.0f, 0, bgfx::getCaps()->homogeneousDepth);
 			bgfx::setViewTransform(0, view, proj);
 			bgfx::setViewRect(0, 0, 0, uint16_t(m_screenwidth), uint16_t(m_screenheight));
@@ -301,6 +314,7 @@ namespace Terrasu {
 					
 					temp.GetComponent<NativeScriptComponent>().DestroyScript(temp.GetComponent<NativeScriptComponent>());
 				}
+				std::cout << "ent" << (uint32_t)ent << std::endl;
 				m_registry.destroy(ent);
 			}
 			m_toDesroy.clear();
@@ -308,71 +322,96 @@ namespace Terrasu {
 		}
 
 
-		auto comparePositions = [](const SpriteComponent& a, const SpriteComponent& b) {
-			return a.order < b.order;
-		};
 
 
-		m_registry.sort<SpriteComponent>(comparePositions);
 		//Render
 		bgfx::touch(0);
+		m_renderer->drawables.clear();
 		auto viewTS = m_registry.view<TransformComponent, SpriteComponent>();
 		for (auto [entity, transform, sprite] : viewTS.each()) {
-			m_renderer->DrawQuad(transform, sprite.material);
+			Entity temp{ entity,this };
+			m_renderer->drawables[sprite.order].push_back(std::make_pair((uint32_t)entity, &sprite));
+			//sprite.Draw(temp.GetTransform(), m_renderer.get());
+			
 		}
 		auto viewTT = m_registry.view<TransformComponent, TextUIComponent>();
 		for (auto [entity, transform, text] : viewTT.each()) {
-			m_renderer->DrawText(transform, text);
+			Entity temp{ entity,this };
+			//m_renderer->drawables[text.order].push_back(&text);
 		}
+
 
 		auto viewTSp = m_registry.view<TransformComponent, SpineComponent>();
 		for (auto [entity, transform, spine] : viewTSp.each()) {
 			spine.image->m_assetManager = m_assetManager.get();
-			spine.image->transform = transform.GetTransform();
+			Entity temp{ entity,this };
+			spine.image->transform = temp.GetTransform();
+			Entity ent{ (entt::entity)entity,this };
+	
 			if (Runtime) {
 				spine.image->Update(dt * 1000);
 			}
 			spine.image->Render(*m_renderer.get());
 			//m_renderer->DrawQuad(transform, sprite.material);
+			Drawable* a = &spine;
+			//m_renderer->drawables[spine.order].push_back(std::make_pair((uint32_t)entity, &spine));
 
 		}
 
 
 		auto viewTLt = m_registry.view<TransformComponent, SpriteLottieComponent>();
 		for (auto [entity, transform, lottie] : viewTLt.each()) {
-			lottie.order += 1;
-			if (lottie.order > lottie.image->totalFrame())
-			{
-				lottie.order = 0;
-			}
-			lottie.image->renderSync(lottie.order,*lottie.surface);
-
-			auto mat = m_assetManager->CreateMaterial("texturedQuad");
-			lottie.surface->buffer();
-			auto mem = bgfx::makeRef(lottie.surface->buffer(), lottie.surface->height() * lottie.surface->bytesPerLine());
-			auto handle = bgfx::createTexture2D(
-				uint16_t(lottie.surface->width())
-				, uint16_t(lottie.surface->height())
-				, 1 < 1
-				, 1
-				, bgfx::TextureFormat::Enum::BGRA8
-				, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE
-				, mem
-			);
-			Texture* tex = new Texture();
-			tex->handle = handle;
-			tex->texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
-			mat.textures.push_back(*tex);
-			m_renderer->DrawQuad(transform, mat);
+		
+			m_renderer->drawables[lottie.order].push_back(std::make_pair((uint32_t)entity, &lottie));
 
 		}
-		nvgBeginFrame(m_renderer->m_nvg, float(m_screenwidth), float(m_screenheight), 1.0f);
-		auto viewTSV = m_registry.view<TransformComponent, SpriteSVGComponent>();
+	
+		auto viewTSV = m_registry.view<TransformComponent, SvgComponent>();
 		for (auto [entity, transform, svg] : viewTSV.each()) {
-			m_renderer->DrawSvg(transform, svg, float(m_screenwidth), float(m_screenheight), cam);
+
+			if (!transform.Scale.x || !transform.Scale.y || !transform.Scale.z)
+				continue;
+			m_renderer->drawables[svg.order].push_back(std::make_pair((uint32_t)entity, &svg));
+	
+		
 		}
 
-		nvgEndFrame(m_renderer->m_nvg);
+
+
+		auto viewTTT = m_registry.view<TransformComponent, TextComponent>();
+		for (auto [entity, transform, text] : viewTTT.each()) {
+			m_renderer->drawables[text.order].push_back(std::make_pair((uint32_t)entity, &text));
+			transform.Scale /= 72;
+			transform.Scale.y *= -1;
+		}
+		
+		for (auto d : m_renderer->drawables) {
+			for (auto b : d.second) {
+				
+				Entity ent{(entt::entity)b.first,this };
+				auto t = ent.GetTransform();
+				auto tt = ent.GetComponent<TagComponent>().tag;
+				try
+				{
+					b.second->Draw(
+						ent.GetComponent<TransformComponent>(),
+						t,
+						cam,
+						m_renderer.get());
+				}
+				catch (const std::exception& e)
+				{
+						std::cout<< e.what();
+				}
+
+			}
+		}
+		for (auto [entity, transform, text] : viewTTT.each()) {
+			transform.Scale *= 72;
+			transform.Scale.y *= -1;
+		}
+
+	
 		bgfx::frame();
 
 		Uint64 end = SDL_GetPerformanceCounter();

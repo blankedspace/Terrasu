@@ -232,6 +232,8 @@ namespace Terrasu{
 			}
 		}
 
+
+
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1);
 
@@ -265,18 +267,23 @@ namespace Terrasu{
 			if (DisplayAddComponentEntry<TextUIComponent>("TextUI")) {
 
 			}
-			if (DisplayAddComponentEntry<SpriteSVGComponent>("SpriteSVGComponent")) {
-				m_SelectionContext->GetComponent<SpriteSVGComponent>().image = m_assetManager->LoadSvg("Assets/play.svg");
-				m_SelectionContext->GetComponent<SpriteSVGComponent>().name = "Assets/play.svg";
+			if (DisplayAddComponentEntry<TextComponent>("Text")) {
+				m_SelectionContext->GetComponent<TextComponent>().text = m_assetManager->CreateText();
+
+			}
+			if (DisplayAddComponentEntry<SvgComponent>("SpriteSVGComponent")) {
+				m_SelectionContext->GetComponent<SvgComponent>().image = m_assetManager->LoadSvg("Assets/play.svg");
+				m_SelectionContext->GetComponent<SvgComponent>().name = "Assets/play.svg";
+
 			}
 			if (DisplayAddComponentEntry<SpriteLottieComponent>("SpriteLottieComponent")) {
-				auto json = m_assetManager->ReadFileStr("Assets/test.json");
+				auto json = m_assetManager->ReadFileStr("Assets/play_pause.json");
 				std::string key = "cat";
 				m_SelectionContext->GetComponent<SpriteLottieComponent>().image = rlottie::Animation::loadFromData(json,key);
 				auto t = m_SelectionContext->GetComponent<SpriteLottieComponent>().image.get();
 				
-				auto w = 100;
-				auto h = 100;
+				auto w = 256;
+				auto h = 256;
 				m_SelectionContext->GetComponent<SpriteLottieComponent>().buffer = std::unique_ptr<uint32_t[]>(new uint32_t[w * h]);
 
 				m_SelectionContext->GetComponent<SpriteLottieComponent>().surface 
@@ -300,18 +307,34 @@ namespace Terrasu{
 			DrawVec3Control("Scale", component.Scale, 1.0f);
 			ImGui::TreePop();
 		}
+		if (DrawComponent<TextComponent>("TextComponent", entity)) {
+			auto& component = entity.GetComponent<TextComponent>();
+			std::string str(component.text->m_text.begin(), component.text->m_text.end());
+			char* buffer = strdup(str.c_str());
+			ImGui::InputInt("##order", &component.order);
+			if (ImGui::ColorEdit3("fill color", component.color.rgba, ImGuiColorEditFlags_Float)) {
+				component.text->OnTextChange(component.text->m_text, component.color);
+			}
+			if (ImGui::InputText("##Text", buffer, 99)) {
+				std::wstring ws(buffer, buffer + strlen(buffer));
+				component.text->m_text = ws;
+				component.text->OnTextChange(ws, component.color);
+			}
+			ImGui::TreePop();
+		}
 
-		if (DrawComponent<SpriteSVGComponent>("SpriteSVGComponent", entity)) {
+		if (DrawComponent<SvgComponent>("SpriteSVGComponent", entity)) {
 
-			auto& component = entity.GetComponent<SpriteSVGComponent>();
+			auto& component = entity.GetComponent<SvgComponent>();
 
 			ImGui::InputInt("##order", &component.order);
 
 			char* buffer = strdup(component.name.c_str());
 			if (ImGui::InputText("##Name", buffer, 99)) {
-				component.name = std::string(buffer);
+				component.name = buffer;
 			}
-
+			ImGui::ColorEdit3("fill color", component.fill_color.rgba, ImGuiColorEditFlags_Float);
+			ImGui::ColorEdit3("stroke color", component.stroke_color.rgba, ImGuiColorEditFlags_Float);
 			ImGui::TreePop();
 		}
 		if (DrawComponent<CameraComponent>("Camera", entity)) {
@@ -550,30 +573,60 @@ namespace Terrasu{
 		bool entityDeleted = false;
 		if ((m_SelectionContext != nullptr && *m_SelectionContext == entity) && !isPopupOpen && ImGui::BeginPopupContextItem("DeletePop", ImGuiPopupFlags_NoOpenOverExistingPopup | ImGuiPopupFlags_MouseButtonRight))
 		{
-			if (ImGui::MenuItem(("Delete " + tag).c_str()))
+			if (ImGui::MenuItem(("Delete " + tag).c_str())) {
 				entityDeleted = true;
+
+			}
 			if (ImGui::MenuItem(("Copy " + tag).c_str()))
 				m_clipboard = m_SelectionContext;
+			if (ImGui::MenuItem(("Save Pefab: " + tag).c_str()))
+				m_sceneSerializer->SerializePrefab(entity);
 			isPopupOpen = true;
 			ImGui::EndPopup();
 		}
-		ImGui::PushID(tag.c_str());
-		if (ImGui::BeginDragDropTarget()) {
-			// Some processing...
-			ImGui::EndDragDropTarget();
-		}
+	
+
 
 		if (ImGui::BeginDragDropSource()) {
 			// Some processing...
+
+	
+			uint32_t* payload = new uint32_t(entity.GetId());
+			ImGui::SetDragDropPayload("SOME_PAYLOAD_TYPE", payload, sizeof(uint32_t));
 			ImGui::EndDragDropSource();
 		}
-		ImGui::PopID();
+		if (ImGui::BeginDragDropTarget()) {
+			// Some processing...
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SOME_PAYLOAD_TYPE")) {
+				// Ensure that the payload type matches the one set in the source
+				if (payload->DataSize == sizeof(uint32_t) && payload->Data) {
+					uint32_t payloadT = *(static_cast<uint32_t*>(payload->Data));
+
+					Entity entit{(entt::entity)payloadT, m_scene };
+					if (entit.GetComponent<TransformComponent>().parent != -1){
+						Entity entitP{ (entt::entity)entit.GetComponent<TransformComponent>().parent, m_scene };
+						auto& vec = entitP.GetComponent<TransformComponent>().children;
+						vec.erase(payloadT);
+					}
+
+					entity.GetComponent<TransformComponent>().children.insert(payloadT);
+					entit.GetComponent<TransformComponent>().parent = entity.GetId();
+					// Do something with the dropped data (e.g., use it to update a variable)
+					// printf("Dropped tag: %s\n", droppedTag); // Use ImGui log or your own means for debug output
+				}
+			}
+			
+
+			ImGui::EndDragDropTarget();
+		}
 		if (opened)
 		{
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, "%s", tag.c_str());
-			if (opened)
-				ImGui::TreePop();
+			for (auto e : entity.GetComponent<TransformComponent>().children) {
+				Entity entit{ (entt::entity)e, m_scene };
+				DrawEntityNode(entit, isPopupOpen);
+			}
+				
 			ImGui::TreePop();
 		}
 
@@ -592,16 +645,29 @@ namespace Terrasu{
 		ImGui::Begin("Scene Hierarchy");
 
 		bool isPopupOpen = false;
-		for (const auto entityID : m_registry.view<TagComponent>()) {
+		for (const auto entityID : m_registry.view<TagComponent, TransformComponent>()) {
 			Entity entity{entityID,m_scene };
-			DrawEntityNode(entity, isPopupOpen);
+			if(entity.GetComponent<TransformComponent>().parent == -1)
+				DrawEntityNode(entity, isPopupOpen);
 		}
 
-		//if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-			//m_SelectionContext = {};
+	
 
+
+
+		if (loadpref) {
+			//char* buffer = strdup(tag.c_str());
+			char* buffer = strdup(m_buffer.c_str());
+			if (ImGui::InputText("##Tag", buffer, 99, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				auto name = std::string(buffer);
+				m_sceneSerializer->DeserializePrefab("Assets/" + name + ".prefab");
+				loadpref = false;
+			}
+		}
 		// Right-click on blank space
 		if (ImGui::BeginPopupContextWindow("CreateEntitiesPop", ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight)){
+
+
 			if (ImGui::MenuItem("Create Empty Entity")){
 				auto entityexample = m_scene->AddEntity("Entity");
 				auto& mat = entityexample.AddComponent<SpriteComponent>().material = m_assetManager->CreateMaterial("tiledQuad");
@@ -618,7 +684,15 @@ namespace Terrasu{
 			if (ImGui::MenuItem("Paste"))
 				m_scene->AddEntity(*m_clipboard);
 
-				ImGui::EndPopup();
+				
+			if (ImGui::MenuItem("load Pefab"))
+			{
+				loadpref = true;
+				//m_sceneSerializer->DeserializePrefab("Assets/Searching.prefab");
+				
+			}
+	
+			ImGui::EndPopup();
 		}
 
 		

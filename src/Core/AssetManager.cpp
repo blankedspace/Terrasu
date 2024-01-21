@@ -18,6 +18,10 @@
 #define NANOSVG_IMPLEMENTATION
 #include "nanosvg/nanosvg.h"
 
+#include "../3rdParty/bgfx/examples/common/cube_atlas.cpp"
+#include "../3rdParty/bgfx/examples/common/font/font_manager.cpp"
+#include "../3rdParty/bgfx/examples/common/font/text_buffer_manager.cpp"
+#include "../3rdParty/bgfx/examples/common/font/utf8.cpp"
 namespace Terrasu {
 
 #if BX_PLATFORM_ANDROID
@@ -137,6 +141,60 @@ namespace Terrasu {
 			return mem;
 		}
 		return NULL;
+	}
+
+
+	FontHandle AssetManager::LoadFont(std::string name)
+	{
+		//m_fontManager = new FontManager(512);
+		//tbman = new TextBufferManager(m_fontManager);
+		//auto s_fontFilePath = "Assets/font/Pretendard-Regular.otf";
+		if (m_fonts.find(name) != m_fonts.end()) {
+			return m_fonts[name];
+		}
+		auto m_fontFiles = loadTtf(name.c_str());
+		auto m_font = m_fontManager->createFontByPixelSize(m_fontFiles, 0, 72);
+
+		m_fonts[name] = m_font;
+		return m_fonts[name];
+	}
+	Text* AssetManager::CreateText(std::string fontname)
+	{
+		auto font = LoadFont(fontname);
+
+		Text* instance = new Text();
+
+		
+		instance->m_staticText = m_tbman->createTextBuffer(FONT_TYPE_ALPHA, BufferType::Static);
+		if(!isValid(instance->m_staticText))
+			instance->m_staticText = m_tbman->createTextBuffer(FONT_TYPE_ALPHA, BufferType::Static);
+
+
+		std::cout << instance->m_staticText.idx << std::endl;
+		m_tbman->setPenPosition(instance->m_staticText, -32, -32);
+		m_tbman->setTextColor(instance->m_staticText, -16777216);
+		m_tbman->appendText(instance->m_staticText, font, L"The quick brown fox jumps over the lazy dog\n");
+		instance->m_text = L"The quick brown fox jumps over the lazy dog\n";
+		instance->tbman = m_tbman.get();
+		instance->m_fonts = font;
+		instance->m_assetmanager = this;
+		return instance;
+	}
+	TrueTypeHandle AssetManager::loadTtf(const char* _filePath)
+	{
+		uint32_t size;
+		auto mem = loadMem(_filePath);
+		void* data = mem->data;
+		size = mem->size;
+		if (NULL != data)
+		{
+			TrueTypeHandle handle = m_fontManager->createTtf((uint8_t*)data, size);
+			return handle;
+		}
+
+		TrueTypeHandle invalid = BGFX_INVALID_HANDLE;
+		return invalid;
+		return TrueTypeHandle();
 	}
 	bgfx::ShaderHandle AssetManager::loadShaderHandle(const char* _name){
 
@@ -340,6 +398,18 @@ namespace Terrasu {
 		delete mem;
 		return s;
 	}
+	std::string getFileName(const std::string& s) {
+
+		char sep = '/';
+
+
+		size_t i = s.rfind(sep, s.length());
+		if (i != std::string::npos) {
+			return(s.substr(i + 1, s.length() - i));
+		}
+
+		return("");
+	}
 
 	Terrasu::AudioData* AssetManager::LoadAudioFile(std::string Filepath)
 	{
@@ -348,6 +418,7 @@ namespace Terrasu {
 		data->data = mem->data;
 		data->dataSize = mem->size;
 		data->currentPosition = 0;
+		data->filename = getFileName(Filepath);
 		return data;
 	}
 	bgfx::UniformHandle AssetManager::CreateUniformHandle(std::string name)
@@ -368,7 +439,7 @@ namespace Terrasu {
 	NSVGimage* AssetManager::LoadSvg(std::string name)
 	{
 		struct NSVGimage* image;
-		image = nsvgParse(&ReadFileStr(name)[0], "px", 96);
+		image = nsvgParse(&ReadFileStr(name)[0], "px", 32);
 		return image;
 	}
 }

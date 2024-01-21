@@ -7,36 +7,62 @@
 #include "Renderer/Vertex.h"
 #include "Asset/SpineAnimation.h"
 #include <unordered_map>
-#include <nanosvg/nanosvg.h>
+
 #include "rlottie/rlottie.h"
+#include <set>
+#include <nanovg/nanovg.h>
+
 namespace Terrasu {
 
+	struct CameraComponent {
+	public:
+		uint32_t backgroundcolor = 7777777;;
+		glm::vec3 eye = { 0.0f, 0.0f, -25.0f };
+		float width = 32, height = 18;
+		int scren_w, screen_h;
+	};
 	struct TransformComponent {
 	public:
 		glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
+		glm::vec4 Scissors = {0,0,0,0};
 
-		glm::mat4 GetTransform() const {
-			glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+		glm::mat4 finalTransform;
 
-			return glm::translate(glm::mat4(1.0f), Translation)
-				* rotation
-				* glm::scale(glm::mat4(1.0f), Scale);
-		}
+		std::string parentuuid;
+		uint32_t parent = -1;  // Reference to parent entity
+		std::set<uint32_t> children;
+
 
 	};
 	struct TagComponent {
 	public:
 		std::string tag;
-
+		std::string UUID;
 	};
 
-	struct SpriteComponent {
+	struct Drawable {
 	public:
+		int order;
+		virtual void Draw(TransformComponent comp, glm::mat4 transform, CameraComponent& camera, Renderer* renderer);
+	};
+
+
+	struct SvgComponent : public Drawable
+	{
+		std::string name;
+		NVGcolor fill_color = {999.0f,999.0f,999.0f,999.0f};
+		NVGcolor stroke_color = { 999.0f,999.0f,999.0f,999.0f };
+		NSVGimage* image;
+		void Draw(TransformComponent comp, glm::mat4 transform, CameraComponent& camera, Renderer* renderer) override;
+	};
+	struct SpriteComponent: public Drawable {
+	public:
+		void Draw(TransformComponent comp, glm::mat4 transform, CameraComponent& camera, Renderer* renderer);
 		Material material;
-		int order = 0;
+
 
 	};
 
@@ -158,13 +184,14 @@ namespace Terrasu {
 	};
 
 
-	struct CameraComponent {
-	public:
-		uint32_t backgroundcolor;
-		glm::vec3 eye = { 0.0f, 0.0f, -25.0f };
-		float width = 32, height = 18;
-	};
 
+	struct TextComponent: public Drawable {
+	public:
+		void Draw(TransformComponent comp, glm::mat4 transform, CameraComponent& camera, Renderer* renderer);
+		Text* text = nullptr;
+		NVGcolor color = { 0.0f,0.0f,0.0f,1.0f };
+		~TextComponent();
+	};
 	struct SimplePhysicsComponent {
 	public:
 		glm::vec4 Rect = { 0.0f, 0.0f, 1.0f, 1.0f };
@@ -177,26 +204,21 @@ namespace Terrasu {
 		} state = Dynamic;
 	};
 
-	struct SpineComponent {
+	struct SpineComponent : public Drawable {
 	public:
 		SpineAnimation* image;
-		int order = 0;
+		void Draw(TransformComponent comp, glm::mat4 transform, CameraComponent& camera, Renderer* renderer) ;
 	};
 
-	struct SpriteSVGComponent {
-	public:
-		std::string name;
-		NSVGimage* image;
-		int order = 0;
 
-	};
-	struct SpriteLottieComponent {
+	struct SpriteLottieComponent: public Drawable {
 	public:
+		void Draw(TransformComponent comp, glm::mat4 transform, CameraComponent& camera, Renderer* renderer) ;
 		std::unique_ptr<rlottie::Animation> image;
 		rlottie::Surface* surface;
 		std::unique_ptr<uint32_t[]> buffer;
 
-		int order = 0;
+
 
 	};
 }

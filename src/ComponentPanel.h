@@ -4,6 +4,7 @@
 #include <string>
 #include "ECS/Entity.h"
 #include "AssetManager.h"
+#include "ECS/SceneSerializer.h"
 namespace Terrasu {
 	class ComponentPanel {
 	public:
@@ -14,9 +15,12 @@ namespace Terrasu {
 		bool DisplayAddComponentEntry(const std::string& entryName);
 	private:
 		AssetManager* m_assetManager;
+		SceneSerializer* m_sceneSerializer;
 		Entity* m_SelectionContext;
 		Entity* m_clipboard;
 		Scene* m_scene;
+		bool loadpref;
+		std::string m_buffer = "aaa";
 		friend Scene;
 	};
 	

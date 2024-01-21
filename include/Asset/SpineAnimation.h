@@ -49,7 +49,7 @@ namespace Terrasu {
 		spine::AnimationState* mState;
 		spine::AnimationStateData* mStateData;
 	
-
+		
 		spine::SkeletonClipping clipper;
 		spine::Vector<float> worldVertices;
 		spine::Vector<unsigned short> quadIndices;
@@ -59,7 +59,7 @@ namespace Terrasu {
 		std::vector<Terrasu::PosUvTileVertex> vertexArray;
 
 		bool			mPlaying;
-
+		float height = 1;
 		float mSpeed = 1;
 		bool mFlipX = false;
 	};

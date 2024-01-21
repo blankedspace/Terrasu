@@ -14,6 +14,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui_impl_bgfx.h"
 #endif
+#include "terrasuutils.h"
 #if BX_PLATFORM_ANDROID
 namespace bx {
 	Location Location::current(const char* _filePath, uint32_t _line)
@@ -24,6 +25,7 @@ namespace bx {
 #endif
 namespace Terrasu
 {
+
 
 	Application::Application(int width,int height):m_width(width),m_height(height)
 	{
@@ -108,6 +110,9 @@ namespace Terrasu
 			//Input
 
 			SDL_GetMouseState(&Input::Mouse.x, &Input::Mouse.y);
+			Input::lastadded = L"";
+			Input::ClickClear();
+			Input::Mouse.leftClicked = false;
 			while (SDL_PollEvent(&event) > 0) {
 #if BX_PLATFORM_WINDOWS
 				ImGui_ImplSDL2_ProcessEvent(&event);
@@ -117,14 +122,17 @@ namespace Terrasu
 				case SDL_MOUSEBUTTONDOWN:
 				{
 					const SDL_MouseButtonEvent& mev = event.button;
-					if (mev.button == SDL_BUTTON_LEFT)
-						Input::Mouse.state = Input::Mouse.leftPressed;
+					if (mev.button == SDL_BUTTON_LEFT) {
+						Input::Mouse.leftPressed = true;
+						Input::Mouse.leftClicked = true;
+					}
 					if (mev.button == SDL_BUTTON_RIGHT)
-						Input::Mouse.state = Input::Mouse.rightPressed;
+						Input::Mouse.rightPressed = true;
 					break;
 				}
 				case SDL_MOUSEBUTTONUP:
-					Input::Mouse.state = Input::Mouse.none;
+					Input::Mouse.rightPressed = false;
+					Input::Mouse.leftPressed = false;
 					break;
 				case SDL_KEYDOWN:
 					Input::SetKeyState((Keys)event.key.keysym.sym, true);
@@ -132,7 +140,22 @@ namespace Terrasu
 				case SDL_KEYUP:
 					Input::SetKeyState((Keys)event.key.keysym.sym, false);
 					break;
-
+				case SDL_TEXTINPUT:
+					/* Add new text onto the end of our text */
+				
+					Input::lastadded = s2ws(event.text.text);
+	
+					break;
+				case SDL_TEXTEDITING:
+					/*
+					Update the composition text.
+					Update the cursor position.
+					Update the selection length (if any).
+					*/
+					//composition = event.edit.text;
+					//cursor = event.edit.start;
+					//selection_len = event.edit.length;
+					break;
 				case SDL_WINDOWEVENT:
 				{
 					const SDL_WindowEvent& wev = event.window;

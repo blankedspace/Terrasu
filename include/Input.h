@@ -8,11 +8,9 @@ namespace Terrasu {
 		//
 	struct mouse{
 		int x = 0, y = 0;
-		enum State {
-			none,
-			leftPressed,
-			rightPressed,
-		} state;
+		bool leftPressed = false;
+		bool rightPressed = false;
+		bool leftClicked = false;
 	};
 
 
@@ -20,6 +18,12 @@ namespace Terrasu {
 
 	class Input{
 	public:
+		static bool IsClicked(Keys key) {
+			if (m_keyClicked.find(key) == m_keyClicked.end()) {
+				return false;
+			}
+			else return m_keyClicked[key];
+		}
 		static bool IsPressed(Keys key) {
 			if (m_keyPressed.find(key) == m_keyPressed.end()){
 				return false;
@@ -28,10 +32,16 @@ namespace Terrasu {
 		}
 		static void SetKeyState(Keys key, bool isPressed) {
 			m_keyPressed[key] = isPressed;
+			m_keyClicked[key] = isPressed;
+		}
+		static void ClickClear() {
+			m_keyClicked.clear();
 		}
 		inline static mouse Mouse;
+		inline static std::wstring lastadded;
 	private:
 		inline static std::unordered_map<Keys,bool> m_keyPressed;
+		inline static std::unordered_map<Keys, bool> m_keyClicked;
 	};
 	/*
 	update

@@ -19,6 +19,7 @@ namespace Terrasu {
 	class Scene {
 	public:
 		Entity AddEntity(std::string tag);
+		Entity AddEntity(std::string tag, std::string uuid);
 		Entity AddEntity(Entity& ent);
 		Scene();
 		~Scene();
