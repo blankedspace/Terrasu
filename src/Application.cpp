@@ -8,14 +8,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui_impl_bgfx.h"
 #endif
-#if BX_PLATFORM_ANDROID
-namespace bx {
-	Location Location::current(const char* _filePath, uint32_t _line)
-	{
-		return Location(_filePath, _line);
-	}
-}
-#endif
+
 namespace Terrasu
 {
 
