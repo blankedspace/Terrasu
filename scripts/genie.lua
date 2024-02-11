@@ -100,21 +100,21 @@ project "Terrasu"
 		}
 	configuration { "wasm*" }
 		kind "ConsoleApp"
-
-		buildoptions { "-stdlib=libc++", "-g", "-pthread" }
-	
-
+		buildoptions {"-pthread"} 
 		linkoptions {
 			"../../../3rdParty/bgfx/.build/wasm/bin/bxDebug.bc", 
 			"../../../3rdParty/bgfx/.build/wasm/bin/bxDebug.bc",
 			"../../../3rdParty/bgfx/.build/wasm/bin/bimgDebug.bc",
 			"../../../3rdParty/bgfx/.build/wasm/bin/bimg_decodeDebug.bc",
 			"../../../3rdParty/bgfx/.build/wasm/bin/bgfxDebug.bc",
+			"../../../3rdParty/SDL/build/libSDL2.a", --TODO build with phtread
+			"../../../3rdParty/SDL/build/libSDL2main.a",
+			"-s USE_PTHREADS=1",
+			"-sAUDIO_WORKLET=1","-sWASM_WORKERS=1", "-sASYNCIFY",
 			"-s TOTAL_MEMORY=32MB",
 			"-s ALLOW_MEMORY_GROWTH=1",
 			"-s NO_DISABLE_EXCEPTION_CATCHING",
 			"-s EMULATE_FUNCTION_POINTER_CASTS",
-			"-s USE_SDL=2",
 			"-s NO_EXIT_RUNTIME=0",
 			"--preload-file ../../../Assets",
 			"-g",
