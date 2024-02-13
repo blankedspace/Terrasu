@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <SDL.h>
+#include "AudioManager.h"
 #if BX_PLATFORM_ANDROID
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
@@ -119,6 +120,18 @@ namespace Terrasu {
 			bgfx::destroy(sh.second->handle);
 		}
 	}
+
+	
+	Terrasu::AudioData* AssetManager::LoadAudioFile(std::string Filepath)
+	{
+		AudioData* data = new AudioData();
+		auto mem = loadMem(Filepath.c_str());
+		data->data = mem->data;
+		data->dataSize = mem->size;
+		data->currentPosition = 0;
+		return data;
+	}
+	
 	const bgfx::Memory* AssetManager::loadMem(const char* _filePath){
 		if (bx::open(m_reader.get(), _filePath)) {
 			uint32_t size = (uint32_t)bx::getSize(m_reader.get());

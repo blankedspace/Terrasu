@@ -8,6 +8,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui_impl_bgfx.h"
 #endif
+#include <AudioManager.h>
 
 namespace Terrasu
 {
@@ -18,10 +19,12 @@ namespace Terrasu
 	}
 	void Application::Init()
 	{
+
 		//initialize SDL
-		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
 		}
+		initAudio();
 		SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
 		m_window = SDL_CreateWindow("Terrasu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_width, m_height, SDL_WINDOW_RESIZABLE);
 		SDL_SysWMinfo wmi;

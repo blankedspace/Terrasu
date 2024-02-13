@@ -1,7 +1,7 @@
 #pragma once
+#include "glm/glm.hpp"
 #include "bgfx/bgfx.h"
 #include "bx/file.h"
-#include "Shader.h"
 #include "Material.h"
 #include <memory>
 #include <string>
@@ -9,7 +9,14 @@
 #include <unordered_map>
 //Loading Shader, Sprites, pure binary, pure text.
 namespace Terrasu {
+	struct AudioData {
+		const uint8_t* data;
+		size_t dataSize;
+		size_t currentPosition;
+		std::string filename;
+	};
 	class AssetManager {
+
 	public:
 		AssetManager();
 		~AssetManager();
@@ -20,7 +27,7 @@ namespace Terrasu {
 		bool WriteFileStr(std::string Filepath, std::string data);
 		std::string ReadFileStr(std::string Filepath);
 		bgfx::UniformHandle CreateUniformHandle(std::string name);
-
+		AudioData* LoadAudioFile(std::string Filepath);
 		void HotReload();
 	private:
 		const bgfx::Memory* loadMem(const char* _filePath);

@@ -320,6 +320,12 @@ namespace Terrasu {
 
 		Uint64 end = SDL_GetPerformanceCounter();
 		dt = (end - start) / (float)SDL_GetPerformanceFrequency();
+		if (BX_PLATFORM_EMSCRIPTEN){
+			auto left = 1.0 / 60.0 - dt;
+			SDL_Delay(left*1000);
+			dt = 1.0/60.0;
+		}
+	
 		timeAlive += dt;
 	}
 

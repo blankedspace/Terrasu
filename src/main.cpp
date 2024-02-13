@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 		s_app = new Terrasu::Application(600, 600); 
 		s_app->Init();
 #if BX_PLATFORM_EMSCRIPTEN
-		emscripten_set_main_loop(updateApp, 0, 0);
+		emscripten_set_main_loop(updateApp, -1, 1);
 #else
 	while (!s_app->MainLoop()) { }
 	ImGui_Implbgfx_Shutdown();

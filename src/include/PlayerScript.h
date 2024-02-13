@@ -1,6 +1,7 @@
 #pragma once
 #include "Entity.h"
 #include "WeaponPickupScript.h"
+
 namespace Terrasu {
 
 
@@ -19,9 +20,10 @@ namespace Terrasu {
 		std::vector<Entity> UiWeapons;
 
 		TextUIComponent* TimerText = nullptr;
+		TextUIComponent* fps = nullptr;
 		float currenttime = 0;
 		int Health = 100;
-
+		AudioData* data;
 		SpriteComponent* Hearts = nullptr;
 		int CurrentWeapon = 0;
 		float m_shootEvery = 0;

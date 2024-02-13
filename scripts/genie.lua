@@ -100,40 +100,36 @@ project "Terrasu"
 		}
 	configuration { "wasm*" }
 		kind "ConsoleApp"
-		buildoptions {"-pthread"} 
+		buildoptions {"-g"} 
 		linkoptions {
-			"../../../3rdParty/bgfx/.build/wasm/bin/bxDebug.bc", 
-			"../../../3rdParty/bgfx/.build/wasm/bin/bxDebug.bc",
-			"../../../3rdParty/bgfx/.build/wasm/bin/bimgDebug.bc",
-			"../../../3rdParty/bgfx/.build/wasm/bin/bimg_decodeDebug.bc",
-			"../../../3rdParty/bgfx/.build/wasm/bin/bgfxDebug.bc",
-			"../../../3rdParty/SDL/build/libSDL2.a", --TODO build with phtread
-			"../../../3rdParty/SDL/build/libSDL2main.a",
-			"-s USE_PTHREADS=1",
-			"-sAUDIO_WORKLET=1","-sWASM_WORKERS=1", "-sASYNCIFY",
-			"-s TOTAL_MEMORY=32MB",
-			"-s ALLOW_MEMORY_GROWTH=1",
+			"../../../3rdParty/bgfx/.build/wasm/bin/bxRelease.bc", 
+			"../../../3rdParty/bgfx/.build/wasm/bin/bxRelease.bc",
+			"../../../3rdParty/bgfx/.build/wasm/bin/bimgRelease.bc",
+			"../../../3rdParty/bgfx/.build/wasm/bin/bimg_decodeRelease.bc",
+			"../../../3rdParty/bgfx/.build/wasm/bin/bgfxRelease.bc",
+			"-sUSE_SDL=2",
+			"-g",
+			"-s TOTAL_MEMORY=256mb",
+			"-s STACK_SIZE=5mb",
 			"-s NO_DISABLE_EXCEPTION_CATCHING",
 			"-s EMULATE_FUNCTION_POINTER_CASTS",
 			"-s NO_EXIT_RUNTIME=0",
-			"--preload-file ../../../Assets",
-			"-g",
-			"-gsource-map"
+			"--preload-file ../../../Assets"
+		
+		}
+		defines 
+		{
+		"BX_CONFIG_DEBUG=0",
+		"YAML_CPP_STATIC_DEFINE",
+		"MA_ENABLE_AUDIO_WORKLETS"
 		}
 
-		removeflags {
-			"OptimizeSpeed",
-		}
-
-		flags {
-			"Optimize"
-		}
 	configuration "Debug"
 		defines 
 		{
 		"BX_CONFIG_DEBUG=1",
-		"YAML_CPP_STATIC_DEFINE"
-		
+		"YAML_CPP_STATIC_DEFINE",
+		"MA_ENABLE_AUDIO_WORKLETS"
 		}
 		flags
 		{

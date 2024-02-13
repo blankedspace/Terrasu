@@ -1,5 +1,6 @@
 #include  "Scripts.h"
 #include "Input.h"
+#include "AudioManager.h"
 namespace Terrasu {
 	void PlayerScript::OnColide(Entity other) {
 	}
@@ -77,15 +78,19 @@ namespace Terrasu {
 	void PlayerScript::OnCreate(){
 		Hearts = &FindObject("Hearts").GetComponent<SpriteComponent>();
 		Entity timer = FindObject("Timer");
-		
+		Entity fpss = FindObject("FPS");
+		fps = &fpss.GetComponent<TextUIComponent>();
 		TimerText = &timer.GetComponent<TextUIComponent>();
-		
+		fps->text = "000";
+		fps->UpdateText(fps->text);
 		Weapon weapon;
 		weapon.ShootEvery = 1;
 		weapon.Ammo = 999999;
 		EquipWeapon(weapon);
 		TimerText->text = "0:0";
 		TimerText->UpdateText(TimerText->text);
+
+
 
 	}
 	static float lerp(float x, float y, float t) {
@@ -94,12 +99,12 @@ namespace Terrasu {
 	void PlayerScript::OnUpdate(float dt) {
 
 		currenttime += dt;
-		if (int(currenttime * 10.0f) % 10) {
-			TimerText->text = std::to_string((int)currenttime / 60) + ":" + std::to_string((int)currenttime % 60);
-			TimerText->UpdateText(TimerText->text);
-			Difficulty = int(currenttime/30);
-		}
 
+		TimerText->text = std::to_string((int)currenttime / 60) + ":" + std::to_string((int)currenttime % 60);
+		TimerText->UpdateText(TimerText->text);
+		
+		fps->text = std::to_string(1/dt);
+		fps->UpdateText(fps->text);
 		GetComponent<SpriteComponent>()->material.uniforms[1].data.y = lerp(GetComponent<SpriteComponent>()->material.uniforms[1].data.y, 1, 3 * dt);
 		GetComponent<SpriteComponent>()->material.uniforms[1].data.z = lerp(GetComponent<SpriteComponent>()->material.uniforms[1].data.z, 1, 3 * dt);
 
@@ -129,72 +134,20 @@ namespace Terrasu {
 		}
 	
 		m_shootEvery += dt;
+		if (Input::Mouse.state == Input::Mouse.leftPressed) {
+			playSound("Assets/highlands.wav", SDL_MIX_MAXVOLUME);
+		}
 		if (Input::Mouse.state == Input::Mouse.rightPressed ) {
 			if (AllWeapons.size() == 0){
 				return;
 			}
-			if (m_shootEvery > AllWeapons[CurrentWeapon].ShootEvery){
+			if (m_shootEvery > AllWeapons[CurrentWeapon].ShootEvery) {
+				//PauseSoundTr();
+
+				data = entity.GetAssetManager()->LoadAudioFile("Assets/test1.mp3");
+				//PlaySoundTr(data);
 				m_shootEvery = 0;
 				int diff = (AllWeapons[CurrentWeapon].Ammount - 1) / 2;
-				for (int i = -diff; i < AllWeapons[CurrentWeapon].Ammount - diff; i++){
-
-					AllWeapons[CurrentWeapon].Ammo--;
-					UiWeapons[CurrentWeapon].GetComponent<SpriteComponent>().material.uniforms[1].data.x = AllWeapons[CurrentWeapon].Ammo/(float)AllWeapons[CurrentWeapon].MaxAmmo;
-					if (AllWeapons[CurrentWeapon].Ammo <= 0){
-						AllWeapons.erase(AllWeapons.begin() + CurrentWeapon);
-						UiWeapons.erase(UiWeapons.begin() + CurrentWeapon);
-						for (int i = CurrentWeapon; i < UiWeapons.size(); i++)
-						{
-							UiWeapons[i].GetComponent<TransformComponent>().Translation.x -= 1.0f/16.0f;
-						}
-
-						CurrentWeapon = 0;
-						if (AllWeapons.size() == 0)
-							return;
-						UiWeapons[CurrentWeapon].GetComponent<SpriteComponent>().material.uniforms[2].data = { 0,0,0,1 };
-						return;
-					}
-					auto ent = Instantiate<SpriteComponent>("Bullet");
-					auto& sprite = ent.GetComponent<SpriteComponent>();
-					auto& phys = ent.AddComponent<SimplePhysicsComponent>();
-					phys.state = phys.PassThrough;
-
-					auto& mat = sprite.material = entity.GetAssetManager()->CreateMaterial("tiledQuad");
-					mat.textures.push_back(*entity.GetAssetManager()->LoadTexture("Assets/8bitPack.png"));
-
-					Uniform uniform;
-					uniform.m_name = "TileData";
-					uniform.data = AllWeapons[CurrentWeapon].tiledata;
-
-
-					mat.uniforms.push_back(uniform);
-
-
-					uniform.m_name = "u_Color";
-					uniform.data = { 1 ,1 ,1 ,1 };
-
-					mat.uniforms.push_back(uniform);
-
-					auto bullet = BindScript<BulletScript>(ent);
-
-					ent.GetComponent<TransformComponent>().Translation = transform->Translation;
-					auto point = FindObjectOfType<CameraScript>()->ScreenToWorld({ Input::Mouse.x, Input::Mouse.y, 0 });
-					bullet->Direction = glm::normalize(point - transform->Translation);
-
-					//ent.AddComponent<NativeScriptComponent>().Bind<BulletController>();
-					bullet->FiredFrom = AllWeapons[CurrentWeapon];
-
-					glm::vec3 v3(bullet->Direction.x, bullet->Direction.y, 0.0f);
-
-					// create the rotation matrix
-					glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(AllWeapons[CurrentWeapon].Angle * i), glm::vec3(0.0f, 0.0f, 1.0f));
-
-					// rotate the vector around the z-axis
-					glm::vec3 rotated_v3 = rotation * glm::vec4(v3, 1.0f);
-
-					// convert the rotated vec3 back to a vec2
-					bullet->Direction = { rotated_v3.x, rotated_v3.y,0 };
-				}
 			}
 		}
 	}
